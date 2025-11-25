@@ -1,0 +1,344 @@
+<!-- views/pages/profile/edit-profile.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
+        }
+        .avatar-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+        }
+        .section-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .nav-link {
+        color: var(--text-dark) !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 0.5rem 1rem !important;
+      }
+
+      .nav-link:hover {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-dark)
+        );
+        color: rgb(227, 220, 220) !important;
+        transform: translateY(-2px);
+      }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg shadow-sm" style="background: linear-gradient(135deg, #2c3e50, #34495e);">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-white" href="/dashboard">
+            <i class="fas fa-exchange-alt me-2"></i>SkillSwap
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link text-white me-3" href="/profile">
+                    <i class="fas fa-eye me-1"></i> View Profile
+                </a>
+                <a class="nav-link text-white" href="/dashboard">
+                    <i class="fas fa-arrow-left me-1"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <h2 class="mb-4"><i class="fas fa-edit"></i> Edit Your Profile</h2>
+
+                <% if (error) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> <%= error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <% } %>
+
+                <% if (success) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> <%= success %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <% } %>
+
+                <!-- Avatar Upload Section -->
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fas fa-camera"></i> Profile Picture</h5>
+                        <div class="my-3">
+                            <% if (user.profile.avatar) { %>
+                                <img src="<%= user.profile.avatar %>" alt="Avatar" class="avatar-preview" id="avatarPreview">
+                            <% } else { %>
+                                <div class="avatar-placeholder" id="avatarPlaceholder">
+                                    <%= user.name.charAt(0).toUpperCase() %>
+                                </div>
+                            <% } %>
+                        </div>
+                        <input type="file" id="avatarInput" accept="image/*" class="d-none">
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('avatarInput').click()">
+                            <i class="fas fa-upload"></i> Upload New Photo
+                        </button>
+                        <p class="text-muted mt-2 mb-0">Max size: 5MB. Formats: JPG, PNG, GIF</p>
+                    </div>
+                </div>
+
+                <!-- Profile Form -->
+                <form action="/profile/edit" method="POST">
+                    <!-- Basic Information -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-user"></i> Basic Information</h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" value="<%= user.name %>" disabled>
+                                <small class="text-muted">Name cannot be changed</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="<%= user.email %>" disabled>
+                                <small class="text-muted">Email cannot be changed</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="bio" class="form-label">Bio</label>
+                                <textarea class="form-control" id="bio" name="bio" rows="4" maxlength="500" placeholder="Tell others about yourself..."><%= user.profile.bio %></textarea>
+                                <small class="text-muted">Max 500 characters</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="location" class="form-label">Location</label>
+                                    <input type="text" class="form-control" id="location" name="location" value="<%= user.profile.location %>" placeholder="e.g., Mumbai, India">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="availability" class="form-label">Availability</label>
+                                    <input type="text" class="form-control" id="availability" name="availability" value="<%= user.profile.availability %>" placeholder="e.g., Weekends 2-6PM">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="language" class="form-label">Language</label>
+                                    <input type="text" class="form-control" id="language" name="language" value="<%= user.profile.language %>" placeholder="e.g., English, Hindi">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="timezone" class="form-label">Timezone</label>
+                                    <select class="form-select" id="timezone" name="timezone">
+                                        <option value="IST" <%= user.profile.timezone === 'IST' ? 'selected' : '' %>>IST (Indian Standard Time)</option>
+                                        <option value="PST" <%= user.profile.timezone === 'PST' ? 'selected' : '' %>>PST (Pacific Standard Time)</option>
+                                        <option value="EST" <%= user.profile.timezone === 'EST' ? 'selected' : '' %>>EST (Eastern Standard Time)</option>
+                                        <option value="GMT" <%= user.profile.timezone === 'GMT' ? 'selected' : '' %>>GMT (Greenwich Mean Time)</option>
+                                        <option value="CET" <%= user.profile.timezone === 'CET' ? 'selected' : '' %>>CET (Central European Time)</option>
+                                        <option value="JST" <%= user.profile.timezone === 'JST' ? 'selected' : '' %>>JST (Japan Standard Time)</option>
+                                        <option value="AEST" <%= user.profile.timezone === 'AEST' ? 'selected' : '' %>>AEST (Australian Eastern Standard Time)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-graduation-cap"></i> Skills</h5>
+                            
+                            <div class="mb-3">
+                                <label for="teachSkills" class="form-label">Skills I Can Teach</label>
+                                <input type="text" class="form-control" id="teachSkills" name="teachSkills" value="<%= user.profile.teachSkills.join(', ') %>" placeholder="e.g., Node.js, MongoDB, Express">
+                                <small class="text-muted">Separate skills with commas</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="learnSkills" class="form-label">Skills I Want to Learn</label>
+                                <input type="text" class="form-control" id="learnSkills" name="learnSkills" value="<%= user.profile.learnSkills.join(', ') %>" placeholder="e.g., React, Python, AWS">
+                                <small class="text-muted">Separate skills with commas</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="experienceLevel" class="form-label">Experience Level</label>
+                                <select class="form-select" id="experienceLevel" name="experienceLevel">
+                                    <option value="" <%= !user.profile.experienceLevel ? 'selected' : '' %>>Select your level</option>
+                                    <option value="Beginner" <%= user.profile.experienceLevel === 'Beginner' ? 'selected' : '' %>>Beginner (0-2 years)</option>
+                                    <option value="Intermediate" <%= user.profile.experienceLevel === 'Intermediate' ? 'selected' : '' %>>Intermediate (2-5 years)</option>
+                                    <option value="Advanced" <%= user.profile.experienceLevel === 'Advanced' ? 'selected' : '' %>>Advanced (5-10 years)</option>
+                                    <option value="Expert" <%= user.profile.experienceLevel === 'Expert' ? 'selected' : '' %>>Expert (10+ years)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Professional Information -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-briefcase"></i> Professional Information</h5>
+                            
+                            <div class="mb-3">
+                                <label for="hourlyRate" class="form-label">Hourly Rate (₹)</label>
+                                <input type="number" class="form-control" id="hourlyRate" name="hourlyRate" value="<%= user.profile.hourlyRate || '' %>" placeholder="e.g., 500" min="0">
+                                <small class="text-muted">Leave empty if you prefer skill exchange without payment</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="website" class="form-label">Website</label>
+                                <input type="url" class="form-control" id="website" name="website" value="<%= user.profile.website || '' %>" placeholder="https://yourwebsite.com">
+                                <small class="text-muted">Your personal website or portfolio</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-share-alt"></i> Social Links</h5>
+                            <p class="text-muted">Connect your social profiles to help others know more about you</p>
+                            
+                            <div class="mb-3">
+                                <label for="github" class="form-label">
+                                    <i class="fab fa-github me-2"></i>GitHub
+                                </label>
+                                <input type="url" class="form-control" id="github" name="github" value="<%= user.profile.socialLinks?.github || '' %>" placeholder="https://github.com/yourusername">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="linkedin" class="form-label">
+                                    <i class="fab fa-linkedin me-2"></i>LinkedIn
+                                </label>
+                                <input type="url" class="form-control" id="linkedin" name="linkedin" value="<%= user.profile.socialLinks?.linkedin || '' %>" placeholder="https://linkedin.com/in/yourusername">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="twitter" class="form-label">
+                                    <i class="fab fa-twitter me-2"></i>Twitter
+                                </label>
+                                <input type="url" class="form-control" id="twitter" name="twitter" value="<%= user.profile.socialLinks?.twitter || '' %>" placeholder="https://twitter.com/yourusername">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="d-flex gap-2 mb-5">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Save Profile
+                        </button>
+                        <a href="/profile" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-eye"></i> View Profile
+                        </a>
+                        <a href="/dashboard" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle avatar upload
+        document.getElementById('avatarInput').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file size
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                return;
+            }
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('avatarPreview');
+                const placeholder = document.getElementById('avatarPlaceholder');
+                
+                if (preview) {
+                    preview.src = e.target.result;
+                } else if (placeholder) {
+                    placeholder.outerHTML = `<img src="${e.target.result}" alt="Avatar" class="avatar-preview" id="avatarPreview">`;
+                }
+            }
+            reader.readAsDataURL(file);
+
+            // Upload to server
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            try {
+                const response = await fetch('/profile/upload-avatar', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-check-circle"></i> Avatar uploaded successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.container').firstChild.nextSibling);
+                    
+                    // Auto dismiss after 3 seconds
+                    setTimeout(() => {
+                        alertDiv.remove();
+                    }, 3000);
+                } else {
+                    alert('Failed to upload avatar: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Failed to upload avatar. Please try again.');
+            }
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

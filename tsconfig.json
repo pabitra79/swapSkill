@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "rootDir": "./",
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "forceConsistentCasingInFileNames": true,
+    "allowUnusedLabels": false,
+    "strict": true,
+    "target": "ES6",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "types": ["node", "express", "express-session"],
+    "lib": ["ESNext"]
+  },
+  "include": ["app/**/*.ts", "app.ts", "types/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

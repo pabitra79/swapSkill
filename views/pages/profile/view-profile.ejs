@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+        --sidebar-bg: #2c3e50;
+        --sidebar-hover: #34495e;
+      }
+      .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+      }
+      .profile-image {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 5px solid white;
+      }
+      .profile-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: bold;
+        color: #667eea;
+        border: 5px solid white;
+      }
+      .skill-badge {
+        background: #e9ecef;
+        color: #495057;
+        padding: 8px 15px;
+        border-radius: 20px;
+        margin: 5px;
+        display: inline-block;
+      }
+      .teach-skill {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .learn-skill {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .social-icon {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 10px;
+        text-decoration: none;
+        transition: transform 0.2s;
+      }
+      .social-icon:hover {
+        transform: scale(1.1);
+      }
+      .github {
+        background: #333;
+        color: white;
+      }
+      .linkedin {
+        background: #0077b5;
+        color: white;
+      }
+      .twitter {
+        background: #1da1f2;
+        color: white;
+      }
+      .nav-link {
+        color: var(--text-dark) !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 0.5rem 1rem !important;
+      }
+
+      .nav-link:hover {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-dark)
+        );
+        color: rgb(47, 10, 10) !important;
+        transform: translateY(-2px);
+      }
+      .hover-effect {
+        transition: all 0.3s ease;
+        border-radius: 5px;
+        margin: 0 2px;
+      }
+      .hover-effect:hover {
+        background: rgba(157, 112, 112, 0.1);
+        transform: translateY(-1px);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav
+      class="navbar navbar-expand-lg navbar-dark shadow-sm"
+      style="background: linear-gradient(135deg, #2c3e50, #34495e)"
+    >
+      <div class="container">
+        <a class="navbar-brand fw-bold text-white" href="/dashboard">
+          <i class="fas fa-exchange-alt me-2"></i>SkillSwap
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link text-white hover-effect" href="/dashboard">
+                <i class="fas fa-home me-1"></i>Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white hover-effect" href="/browse">
+                <i class="fas fa-search me-1"></i>Browse
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white hover-effect" href="/sessions">
+                <i class="fas fa-calendar me-1"></i>Sessions
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active text-white fw-bold hover-effect"
+                href="/profile"
+              >
+                <i class="fas fa-user me-1"></i>Profile
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-2 text-center">
+            <% if (userProfile.profileImage) { %>
+            <img
+              src="<%= userProfile.profileImage %>"
+              class="profile-image rounded-circle"
+              alt="Profile Image"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            />
+            <div class="profile-placeholder" style="display: none">
+              <%= userProfile.name.charAt(0).toUpperCase() %>
+            </div>
+            <% } else { %>
+            <div class="profile-placeholder">
+              <%= userProfile.name.charAt(0).toUpperCase() %>
+            </div>
+            <% } %>
+          </div>
+          <div class="col-md-8">
+            <h1 class="display-5 fw-bold"><%= userProfile.name %></h1>
+            <p class="lead mb-2">
+              <i class="fas fa-map-marker-alt me-2"></i>
+              <%= userProfile.profile?.location || 'Location not set' %>
+            </p>
+            <p class="mb-0">
+              <% if (userProfile.profile?.experienceLevel) { %>
+              <span class="badge bg-light text-dark me-2">
+                <i class="fas fa-star me-1"></i><%=
+                userProfile.profile.experienceLevel %>
+              </span>
+              <% } %>
+              <span class="badge bg-light text-dark">
+                <i class="fas fa-clock me-1"></i>
+                <%= userProfile.profile?.availability || 'Flexible' %>
+              </span>
+              <% if (userProfile.profile?.language) { %>
+              <span class="badge bg-light text-dark ms-2">
+                <i class="fas fa-language me-1"></i><%=
+                userProfile.profile.language %>
+              </span>
+              <% } %>
+            </p>
+          </div>
+          <div class="col-md-2 text-end">
+            <% if (isOwnProfile) { %>
+            <a href="/profile/edit" class="btn btn-light mb-2">
+              <i class="fas fa-edit me-2"></i>Edit Profile
+            </a>
+            <a href="/dashboard" class="btn btn-outline-light">
+              <i class="fas fa-arrow-left me-2"></i>Dashboard
+            </a>
+            <% } else { %>
+            <button class="btn btn-light mb-2">
+              <i class="fas fa-envelope me-2"></i>Message
+            </button>
+            <a href="/dashboard" class="btn btn-outline-light">
+              <i class="fas fa-arrow-left me-2"></i>Back
+            </a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mb-5">
+      <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+          <!-- Bio Section -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-user me-2"></i>About Me</h5>
+            </div>
+            <div class="card-body">
+              <% if (userProfile.profile?.bio) { %>
+              <p class="card-text"><%= userProfile.profile.bio %></p>
+              <% } else { %>
+              <p class="text-muted fst-italic">
+                <% if (isOwnProfile) { %> No bio added yet. Click "Edit Profile"
+                to add your bio. <% } else { %> No bio provided yet. <% } %>
+              </p>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Skills Section -->
+          <div class="row">
+            <!-- Skills I Can Teach -->
+            <div class="col-md-6 mb-4">
+              <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                  <h6 class="mb-0">
+                    <i class="fas fa-chalkboard-teacher me-2"></i>
+                    Skills I Can Teach
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <% if (userProfile.profile?.teachSkills &&
+                  userProfile.profile.teachSkills.length > 0) { %> <%
+                  userProfile.profile.teachSkills.forEach(skill => { %>
+                  <span class="skill-badge teach-skill">
+                    <i class="fas fa-check me-1"></i><%= skill %>
+                  </span>
+                  <% }); %> <% } else { %>
+                  <p class="text-muted fst-italic">
+                    <% if (isOwnProfile) { %> Add your teaching skills to let
+                    others know what you can teach. <% } else { %> No teaching
+                    skills added yet. <% } %>
+                  </p>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Skills I Want to Learn -->
+            <div class="col-md-6 mb-4">
+              <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                  <h6 class="mb-0">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    Skills I Want to Learn
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <% if (userProfile.profile?.learnSkills &&
+                  userProfile.profile.learnSkills.length > 0) { %> <%
+                  userProfile.profile.learnSkills.forEach(skill => { %>
+                  <span class="skill-badge learn-skill">
+                    <i class="fas fa-book me-1"></i><%= skill %>
+                  </span>
+                  <% }); %> <% } else { %>
+                  <p class="text-muted fst-italic">
+                    <% if (isOwnProfile) { %> Add skills you want to learn to
+                    find matching partners. <% } else { %> No learning goals
+                    added yet. <% } %>
+                  </p>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Section -->
+          <% if (userProfile.stats) { %>
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-chart-line me-2"></i>Stats & Activity
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row text-center">
+                <div class="col-6 col-md-3 mb-3">
+                  <div class="h4 text-primary">
+                    <%= userProfile.stats.completedSessions || 0 %>
+                  </div>
+                  <small class="text-muted">Completed Sessions</small>
+                </div>
+                <div class="col-6 col-md-3 mb-3">
+                  <div class="h4 text-success">
+                    <%= userProfile.stats.hoursTaught || 0 %>
+                  </div>
+                  <small class="text-muted">Hours Taught</small>
+                </div>
+                <div class="col-6 col-md-3 mb-3">
+                  <div class="h4 text-info">
+                    <%= userProfile.stats.hoursLearned || 0 %>
+                  </div>
+                  <small class="text-muted">Hours Learned</small>
+                </div>
+                <div class="col-6 col-md-3 mb-3">
+                  <div class="h4 text-warning">
+                    <%= userProfile.stats.responseRate || 0 %>%
+                  </div>
+                  <small class="text-muted">Response Rate</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+          <!-- Contact & Info Card -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h6 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>Profile Information
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <strong><i class="fas fa-envelope me-2"></i>Email</strong>
+                <p class="mb-1"><%= userProfile.email %></p>
+              </div>
+
+              <% if (userProfile.profile?.timezone) { %>
+              <div class="mb-3">
+                <strong><i class="fas fa-globe me-2"></i>Timezone</strong>
+                <p class="mb-1"><%= userProfile.profile.timezone %></p>
+              </div>
+              <% } %> <% if (userProfile.profile?.hourlyRate) { %>
+              <div class="mb-3">
+                <strong
+                  ><i class="fas fa-money-bill-wave me-2"></i>Hourly
+                  Rate</strong
+                >
+                <p class="mb-1">₹<%= userProfile.profile.hourlyRate %>/hour</p>
+              </div>
+              <% } %> <% if (userProfile.profile?.website) { %>
+              <div class="mb-3">
+                <strong><i class="fas fa-globe me-2"></i>Website</strong>
+                <p class="mb-1">
+                  <a
+                    href="<%= userProfile.profile.website %>"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <%= userProfile.profile.website %>
+                  </a>
+                </p>
+              </div>
+              <% } %>
+
+              <!-- Social Links -->
+              <% if (userProfile.profile?.socialLinks &&
+              (userProfile.profile.socialLinks.github ||
+              userProfile.profile.socialLinks.linkedin ||
+              userProfile.profile.socialLinks.twitter)) { %>
+              <div class="mb-3">
+                <strong><i class="fas fa-share-alt me-2"></i>Connect</strong>
+                <div class="mt-2">
+                  <% if (userProfile.profile.socialLinks.github) { %>
+                  <a
+                    href="<%= userProfile.profile.socialLinks.github %>"
+                    class="social-icon github"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="GitHub"
+                  >
+                    <i class="fab fa-github"></i>
+                  </a>
+                  <% } %> <% if (userProfile.profile.socialLinks.linkedin) { %>
+                  <a
+                    href="<%= userProfile.profile.socialLinks.linkedin %>"
+                    class="social-icon linkedin"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="LinkedIn"
+                  >
+                    <i class="fab fa-linkedin"></i>
+                  </a>
+                  <% } %> <% if (userProfile.profile.socialLinks.twitter) { %>
+                  <a
+                    href="<%= userProfile.profile.socialLinks.twitter %>"
+                    class="social-icon twitter"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Twitter"
+                  >
+                    <i class="fab fa-twitter"></i>
+                  </a>
+                  <% } %>
+                </div>
+              </div>
+              <% } %>
+
+              <div class="mt-3 pt-3 border-top">
+                <small class="text-muted">
+                  <i class="fas fa-calendar me-1"></i>
+                  Member since <%= new
+                  Date(userProfile.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric', month: 'long', day: 'numeric' }) %>
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons for Non-Own Profiles -->
+          <% if (!isOwnProfile) { %>
+          <div class="card">
+            <div class="card-body">
+              <button class="btn btn-primary w-100 mb-2">
+                <i class="fas fa-handshake me-2"></i>Request Skill Swap
+              </button>
+              <button class="btn btn-outline-primary w-100 mb-2">
+                <i class="fas fa-envelope me-2"></i>Send Message
+              </button>
+              <button class="btn btn-outline-secondary w-100">
+                <i class="fas fa-star me-2"></i>Add to Favorites
+              </button>
+            </div>
+          </div>
+          <% } %>
+
+          <!-- Quick Actions for Own Profile -->
+          <% if (isOwnProfile) { %>
+          <div class="card">
+            <div class="card-header">
+              <h6 class="mb-0">
+                <i class="fas fa-bolt me-2"></i>Quick Actions
+              </h6>
+            </div>
+            <div class="card-body">
+              <a href="/profile/edit" class="btn btn-primary w-100 mb-2">
+                <i class="fas fa-edit me-2"></i>Edit Profile
+              </a>
+              <a href="/browse" class="btn btn-outline-primary w-100 mb-2">
+                <i class="fas fa-search me-2"></i>Find Learning Partners
+              </a>
+              <a href="/sessions" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-calendar me-2"></i>My Sessions
+              </a>
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

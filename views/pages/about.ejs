@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About - SkillSwap</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --dark-blue: #2c3e50;
+        --light-bg: #f8f9fa;
+      }
+
+      /* Improved Navbar Styles */
+      .navbar {
+        background: var(--primary-gradient) !important;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        padding: 0.8rem 0;
+      }
+
+      .navbar-brand {
+        color: white !important;
+        font-weight: bold;
+        font-size: 1.5rem;
+      }
+
+      .navbar-nav .nav-link {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 0.5rem 1rem !important;
+        margin: 0 0.1rem;
+      }
+
+      .navbar-nav .nav-link:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: white !important;
+        transform: translateY(-1px);
+      }
+
+      .navbar-nav .nav-link.active {
+        background: rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+      }
+
+      .navbar-toggler {
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .navbar-toggler-icon {
+        filter: invert(1);
+      }
+
+      .btn-primary {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 20px;
+        padding: 0.5rem 1.5rem;
+      }
+
+      .dropdown-menu {
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+
+      .dropdown-item {
+        border-radius: 5px;
+        margin: 0.1rem 0.3rem;
+      }
+
+      .dropdown-item:hover {
+        background: var(--primary-gradient);
+        color: white !important;
+      }
+
+      /* Existing Styles */
+      .hero-section {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 5rem 0;
+        text-align: center;
+        margin-top: 0;
+      }
+
+      .feature-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .feature-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 2rem;
+      }
+
+      .stats-section {
+        background: var(--light-bg);
+        padding: 4rem 0;
+      }
+
+      .stat-number {
+        font-size: 3rem;
+        font-weight: bold;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .how-it-works-step {
+        text-align: center;
+        padding: 2rem 1rem;
+      }
+
+      .step-number {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      .tech-stack {
+        background: var(--dark-blue);
+        color: white;
+        padding: 4rem 0;
+      }
+
+      .tech-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #667eea;
+      }
+
+      .testimonial-card {
+        border-radius: 15px;
+        border: 1px solid #e9ecef;
+        padding: 2rem;
+        height: 100%;
+      }
+
+      .testimonial-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        margin-right: 1rem;
+      }
+
+      .cta-section {
+        background: var(--secondary-gradient);
+        color: white;
+        padding: 5rem 0;
+        text-align: center;
+      }
+
+      .btn-cta {
+        background: white;
+        color: #667eea;
+        border: none;
+        padding: 12px 30px;
+        font-weight: bold;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-cta:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Fixed Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <i class="fas fa-exchange-alt me-2"></i>SkillSwap
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="fas fa-home me-1"></i>Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/browse">
+                <i class="fas fa-users me-1"></i>Browse Users
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/about">
+                <i class="fas fa-info-circle me-1"></i>About
+              </a>
+            </li>
+          </ul>
+
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="/api/login">
+                <i class="fas fa-sign-in-alt me-1"></i>Login
+              </a>
+            </li>
+            <li class="nav-item ms-2">
+              <a class="btn btn-primary" href="/api/register">
+                <i class="fas fa-user-plus me-1"></i>Sign Up Free
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Rest of your about page content remains exactly the same -->
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <h1 class="display-4 fw-bold mb-4">
+              Revolutionizing Skill Sharing
+            </h1>
+            <p class="lead mb-5">
+              SkillSwap is a time-based knowledge trading platform where users
+              exchange skills directly — no money involved. Teach what you know,
+              learn what you don't.
+            </p>
+            <a href="/api/register" class="btn btn-light btn-lg px-4 py-2">
+              <i class="fas fa-rocket me-2"></i>Start Swapping Today
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Problem & Solution Section -->
+    <section class="py-5">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6 mb-5 mb-lg-0">
+            <h2 class="fw-bold mb-4">The Problem We Solve</h2>
+            <p class="text-muted mb-4">
+              Many learners struggle to afford paid courses, while skilled
+              individuals lack platforms to share knowledge fairly. Traditional
+              learning platforms create financial barriers, leaving talent
+              untapped.
+            </p>
+            <div class="d-flex align-items-start mb-3">
+              <i class="fas fa-exclamation-circle text-danger me-3 mt-1"></i>
+              <div>
+                <h5>Financial Barriers</h5>
+                <p class="text-muted mb-0">
+                  Quality education often comes with high costs that many cannot
+                  afford.
+                </p>
+              </div>
+            </div>
+            <div class="d-flex align-items-start mb-3">
+              <i class="fas fa-exclamation-circle text-danger me-3 mt-1"></i>
+              <div>
+                <h5>Untapped Knowledge</h5>
+                <p class="text-muted mb-0">
+                  Skilled individuals have no fair platform to share their
+                  expertise.
+                </p>
+              </div>
+            </div>
+            <div class="d-flex align-items-start">
+              <i class="fas fa-exclamation-circle text-danger me-3 mt-1"></i>
+              <div>
+                <h5>One-Way Learning</h5>
+                <p class="text-muted mb-0">
+                  Traditional models don't leverage the fact that everyone has
+                  something to teach.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <h2 class="fw-bold mb-4">Our Innovative Solution</h2>
+            <p class="text-muted mb-4">
+              SkillSwap introduces an equal time-based exchange model where
+              users trade skills directly. Your knowledge becomes your currency.
+            </p>
+            <div class="d-flex align-items-start mb-3">
+              <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+              <div>
+                <h5>Time-Based Trading</h5>
+                <p class="text-muted mb-0">
+                  Exchange hours of teaching for hours of learning — fair and
+                  balanced.
+                </p>
+              </div>
+            </div>
+            <div class="d-flex align-items-start mb-3">
+              <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+              <div>
+                <h5>Community Driven</h5>
+                <p class="text-muted mb-0">
+                  Build connections while expanding your skill set through
+                  direct peer exchange.
+                </p>
+              </div>
+            </div>
+            <div class="d-flex align-items-start">
+              <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+              <div>
+                <h5>Zero Cost Learning</h5>
+                <p class="text-muted mb-0">
+                  Access valuable knowledge without financial barriers using
+                  what you already know.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5 bg-light">
+      <div class="container">
+        <div class="row text-center mb-5">
+          <div class="col-lg-8 mx-auto">
+            <h2 class="fw-bold mb-3">Powerful Features</h2>
+            <p class="text-muted">
+              Everything you need for effective skill trading in one platform
+            </p>
+          </div>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-4">
+            <div class="feature-card p-4">
+              <div class="feature-icon">
+                <i class="fas fa-user-friends"></i>
+              </div>
+              <h4 class="text-center mb-3">Smart Matching</h4>
+              <p class="text-muted text-center">
+                Find perfect skill exchange partners based on what you can teach
+                and want to learn.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="feature-card p-4">
+              <div class="feature-icon">
+                <i class="fas fa-comments"></i>
+              </div>
+              <h4 class="text-center mb-3">Real-Time Chat</h4>
+              <p class="text-muted text-center">
+                Communicate instantly with potential partners to arrange
+                sessions and discuss details.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="feature-card p-4">
+              <div class="feature-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <h4 class="text-center mb-3">Session Tracking</h4>
+              <p class="text-muted text-center">
+                Log teaching and learning hours to maintain balanced exchanges
+                with partners.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="feature-card p-4">
+              <div class="feature-icon">
+                <i class="fas fa-star"></i>
+              </div>
+              <h4 class="text-center mb-3">Rating System</h4>
+              <p class="text-muted text-center">
+                Rate your exchange partners to build a trusted community of
+                skilled individuals.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="feature-card p-4">
+              <div class="feature-icon">
+                <i class="fas fa-bell"></i>
+              </div>
+              <h4 class="text-center mb-3">Smart Notifications</h4>
+              <p class="text-muted text-center">
+                Get instant alerts for new requests, messages, and session
+                reminders.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="feature-card p-4">
+              <div class="feature-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <h4 class="text-center mb-3">Progress Tracking</h4>
+              <p class="text-muted text-center">
+                Monitor your skill development and teaching impact through
+                detailed analytics.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-5">
+      <div class="container">
+        <div class="row text-center mb-5">
+          <div class="col-lg-8 mx-auto">
+            <h2 class="fw-bold mb-3">How SkillSwap Works</h2>
+            <p class="text-muted">
+              Get started with skill trading in four simple steps
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-3 col-md-6">
+            <div class="how-it-works-step">
+              <div class="step-number">1</div>
+              <h4>Create Profile</h4>
+              <p class="text-muted">
+                List skills you can teach and skills you want to learn. Add your
+                availability and bio.
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="how-it-works-step">
+              <div class="step-number">2</div>
+              <h4>Find Partners</h4>
+              <p class="text-muted">
+                Browse users or get smart matches based on complementary skill
+                sets.
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="how-it-works-step">
+              <div class="step-number">3</div>
+              <h4>Swap Skills</h4>
+              <p class="text-muted">
+                Chat to arrange sessions, then meet via video call to exchange
+                knowledge.
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="how-it-works-step">
+              <div class="step-number">4</div>
+              <h4>Track & Rate</h4>
+              <p class="text-muted">
+                Log session hours and rate your partners to maintain balanced
+                exchanges.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+      <div class="container">
+        <div class="row text-center">
+          <div class="col-md-3 col-6 mb-4">
+            <div class="stat-number">500+</div>
+            <p class="text-muted">Active Users</p>
+          </div>
+          <div class="col-md-3 col-6 mb-4">
+            <div class="stat-number">1,200+</div>
+            <p class="text-muted">Skills Exchanged</p>
+          </div>
+          <div class="col-md-3 col-6 mb-4">
+            <div class="stat-number">2,500+</div>
+            <p class="text-muted">Hours Traded</p>
+          </div>
+          <div class="col-md-3 col-6 mb-4">
+            <div class="stat-number">4.8/5</div>
+            <p class="text-muted">Average Rating</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Technology Stack -->
+    <section class="tech-stack">
+      <div class="container">
+        <div class="row text-center mb-5">
+          <div class="col-lg-8 mx-auto">
+            <h2 class="fw-bold mb-3">Built With Modern Technology</h2>
+            <p class="text-light">
+              We use cutting-edge technologies to deliver a seamless experience
+            </p>
+          </div>
+        </div>
+        <div class="row text-center">
+          <div class="col-md-2 col-4 mb-4">
+            <i class="fab fa-node-js tech-icon"></i>
+            <p>Node.js</p>
+          </div>
+
+          <div class="col-md-2 col-4 mb-4">
+            <i class="fab fa-js-square tech-icon"></i>
+            <p>JavaScript</p>
+          </div>
+
+          <div class="col-md-2 col-4 mb-4">
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg"
+              width="40"
+            />
+            <p>TypeScript</p>
+          </div>
+
+          <div class="col-md-2 col-4 mb-4">
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg"
+              width="40"
+            />
+            <p>MongoDB</p>
+          </div>
+
+          <div class="col-md-2 col-4 mb-4">
+            <i class="fab fa-bootstrap tech-icon"></i>
+            <p>Bootstrap</p>
+          </div>
+
+          <div class="col-md-2 col-4 mb-4">
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg"
+              width="40"
+            />
+            <p>Socket.io</p>
+          </div>
+
+          <div class="col-md-2 col-4 mb-4">
+            <i class="fas fa-shield-alt tech-icon"></i>
+            <p>JWT Auth</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-5">
+      <div class="container">
+        <div class="row text-center mb-5">
+          <div class="col-lg-8 mx-auto">
+            <h2 class="fw-bold mb-3">What Our Users Say</h2>
+            <p class="text-muted">
+              Hear from SkillSwap members who transformed their skills
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-4 mb-4">
+            <div class="testimonial-card">
+              <div class="d-flex align-items-center mb-3">
+                <div class="testimonial-avatar">S</div>
+                <div>
+                  <h5 class="mb-0">Sarah Chen</h5>
+                  <small class="text-muted">Web Developer</small>
+                </div>
+              </div>
+              <p class="text-muted">
+                "I taught Node.js to three people and in exchange learned React,
+                UI design, and Python. This platform saved me thousands in
+                course fees!"
+              </p>
+              <div class="text-warning">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 mb-4">
+            <div class="testimonial-card">
+              <div class="d-flex align-items-center mb-3">
+                <div class="testimonial-avatar">M</div>
+                <div>
+                  <h5 class="mb-0">Michael Torres</h5>
+                  <small class="text-muted">Data Scientist</small>
+                </div>
+              </div>
+              <p class="text-muted">
+                "As a data scientist, I exchanged Python lessons for frontend
+                development skills. Now I can build complete data visualization
+                applications!"
+              </p>
+              <div class="text-warning">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 mb-4">
+            <div class="testimonial-card">
+              <div class="d-flex align-items-center mb-3">
+                <div class="testimonial-avatar">P</div>
+                <div>
+                  <h5 class="mb-0">Priya Sharma</h5>
+                  <small class="text-muted">UX Designer</small>
+                </div>
+              </div>
+              <p class="text-muted">
+                "I taught UI/UX design principles and learned backend
+                development. The session tracking feature ensures fair
+                exchanges. Highly recommended!"
+              </p>
+              <div class="text-warning">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-8 text-center">
+            <h2 class="fw-bold mb-4">Ready to Transform Your Skills?</h2>
+            <p class="lead mb-5">
+              Join thousands of learners and teachers exchanging knowledge
+              without financial barriers.
+            </p>
+            <div
+              class="d-flex flex-column flex-sm-row justify-content-center gap-3"
+            >
+              <a href="/api/register" class="btn btn-cta btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Sign Up Free
+              </a>
+              <a href="/browse" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-search me-2"></i>Browse Users
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <p class="mb-0">&copy; 2024 SkillSwap. All rights reserved.</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a href="#" class="text-light me-3"
+              ><i class="fab fa-twitter"></i
+            ></a>
+            <a href="#" class="text-light me-3"
+              ><i class="fab fa-linkedin"></i
+            ></a>
+            <a href="#" class="text-light me-3"
+              ><i class="fab fa-github"></i
+            ></a>
+            <a href="#" class="text-light"
+              ><i class="fab fa-product-hunt"></i
+            ></a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

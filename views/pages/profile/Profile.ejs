@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - SkillSwap</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .nav-link {
+        color: var(--text-dark) !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 0.5rem 1rem !important;
+      }
+
+      .nav-link:hover {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-dark)
+        );
+        color: rgb(47, 10, 10) !important;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('../../partials/navbar') %>
+
+    <div class="container mt-4">
+      <!-- Profile Header -->
+      <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+          <h2>🏷️ John Doe</h2>
+          <p class="lead">Backend Developer | Mumbai</p>
+          <div class="mb-2">
+            <span class="text-warning">⭐⭐⭐⭐⭐</span>
+            <span>4.8/5 (12 reviews)</span>
+          </div>
+          <button class="btn btn-primary">Edit Profile</button>
+        </div>
+        <div class="col-md-4 text-center">
+          <img
+            src="https://via.placeholder.com/150"
+            class="rounded-circle mb-2"
+            alt="Profile"
+          />
+          <div>
+            <button class="btn btn-outline-secondary btn-sm">Upload New</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-6">
+          <!-- Bio -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5>🏷️ BIO</h5>
+              <p>
+                I'm a backend developer with 3 years experience in Node.js and
+                MongoDB. Looking to learn React to become full-stack.
+              </p>
+            </div>
+          </div>
+
+          <!-- Details -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5>📍 DETAILS</h5>
+              <ul class="list-unstyled">
+                <li>📍 <strong>Location:</strong> Mumbai, India</li>
+                <li>🕐 <strong>Availability:</strong> Weekends 2-6PM</li>
+                <li>🗣️ <strong>Language:</strong> English, Hindi</li>
+                <li>🌐 <strong>Timezone:</strong> IST</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Skills -->
+          <div class="card">
+            <div class="card-body">
+              <h5>💡 I TEACH:</h5>
+              <ul>
+                <li>Node.js</li>
+                <li>MongoDB</li>
+                <li>Express.js</li>
+              </ul>
+
+              <h5 class="mt-4">🎯 I WANT TO LEARN:</h5>
+              <ul>
+                <li>React</li>
+                <li>UI/UX Design</li>
+                <li>AWS</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-6">
+          <!-- Stats -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5>📊 STATS & ACTIVITY</h5>
+              <div class="row text-center">
+                <div class="col-6">
+                  <div class="h4 text-primary">15</div>
+                  <small>Completed Sessions</small>
+                </div>
+                <div class="col-6">
+                  <div class="h4 text-primary">25</div>
+                  <small>Hours Taught</small>
+                </div>
+              </div>
+              <div class="row text-center mt-3">
+                <div class="col-6">
+                  <div class="h4 text-primary">22</div>
+                  <small>Hours Learned</small>
+                </div>
+                <div class="col-6">
+                  <div class="h4 text-primary">95%</div>
+                  <small>Response Rate</small>
+                </div>
+              </div>
+              <div class="mt-3">
+                <small class="text-muted">Member Since: January 2024</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews -->
+          <div class="card">
+            <div class="card-body">
+              <h5>🏆 RECENT REVIEWS</h5>
+
+              <div class="border rounded p-3 mb-3">
+                <div class="text-warning">⭐⭐⭐⭐⭐</div>
+                <p>
+                  "John is an amazing teacher! Very patient and knowledgeable."
+                </p>
+                <div class="d-flex justify-content-between">
+                  <strong>- Sarah</strong>
+                  <small class="text-muted">2 days ago</small>
+                </div>
+              </div>
+
+              <div class="border rounded p-3">
+                <div class="text-warning">⭐⭐⭐⭐☆</div>
+                <p>"Great at explaining complex topics in simple way."</p>
+                <div class="d-flex justify-content-between">
+                  <strong>- Mike</strong>
+                  <small class="text-muted">1 week ago</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

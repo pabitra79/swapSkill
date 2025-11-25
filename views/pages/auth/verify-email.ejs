@@ -1,0 +1,21 @@
+<%- include('../../layouts/main-layout', { title, body: `
+<div class="auth-container">
+  <div class="auth-card">
+    <h2 class="auth-title">Email Verification</h2>
+
+    ${success ? `
+    <div class="alert alert-success">${success}</div>
+    <a href="/api/login" class="btn btn-primary w-100 mt-3"
+      >Continue to Login</a
+    >
+    ` : error ? `
+    <div class="alert alert-danger">${error}</div>
+    <a href="/api/register" class="btn btn-secondary w-100 mt-3"
+      >Register Again</a
+    >
+    ` : `
+    <div class="alert alert-info">Verifying your email, please wait...</div>
+    `}
+  </div>
+</div>
+` }) %>
