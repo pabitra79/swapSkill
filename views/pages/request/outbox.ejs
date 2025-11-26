@@ -1,496 +1,348 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-      .request-card {
-        transition: transform 0.2s, box-shadow 0.2s;
-      }
-      .request-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      }
-      .badge-pending {
-        background-color: #ffc107;
-        color: #000;
-      }
-      .badge-accepted {
-        background-color: #28a745;
-      }
-      .badge-declined {
-        background-color: #dc3545;
-      }
-      .badge-cancelled {
-        background-color: #6c757d;
-      }
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #f8f9fa; }
+        
+        .sidebar {
+            background: rgba(30, 30, 122, 0.95);
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+        .sidebar .nav-link {
+            color: #d1d5db !important;
+            padding: 15px 20px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: var(--primary-gradient);
+            color: white !important;
+            transform: translateX(8px);
+        }
+        
+        .request-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-left: 5px solid transparent;
+        }
+        .request-card.pending { border-left-color: #f59e0b; }
+        .request-card.accepted { border-left-color: #10b981; }
+        .request-card.declined { border-left-color: #ef4444; }
+        .request-card.cancelled { border-left-color: #6b7280; }
+        .request-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
+        }
+        .user-avatar-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: 3px solid white;
+        }
+        
+        .skill-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin: 5px;
+        }
+        .skill-teach { background: #d4edda; color: #155724; }
+        .skill-learn { background: #cce5ff; color: #004085; }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-accepted { background: #d1fae5; color: #065f46; }
+        .status-declined { background: #fee2e2; color: #991b1b; }
+        .status-cancelled { background: #f3f4f6; color: #4b5563; }
+        
+        .filter-tabs {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .filter-tabs .btn {
+            margin-right: 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .empty-state i {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin-bottom: 20px;
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <%- include('../../partials/navbar') %>
 
-    <div class="container mt-5">
-      <div class="row">
-        <div class="col-12">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-paper-plane"></i> Sent Requests</h2>
-            <a href="/requests/inbox" class="btn btn-outline-primary">
-              <i class="fas fa-inbox"></i> Received Requests
-            </a>
-          </div>
-
-          <!-- Filter Tabs -->
-          <ul class="nav nav-tabs mb-4">
-            <li class="nav-item">
-              <a
-                class="nav-link <%= activeTab === 'all' ? 'active' : '' %>"
-                href="/requests/outbox?status=all"
-              >
-                All (<%= requests.length %>)
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= activeTab === 'pending' ? 'active' : '' %>"
-                href="/requests/outbox?status=pending"
-              >
-                Pending
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= activeTab === 'accepted' ? 'active' : '' %>"
-                href="/requests/outbox?status=accepted"
-              >
-                Accepted
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= activeTab === 'declined' ? 'active' : '' %>"
-                href="/requests/outbox?status=declined"
-              >
-                Declined
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= activeTab === 'cancelled' ? 'active' : '' %>"
-                href="/requests/outbox?status=cancelled"
-              >
-                Cancelled
-              </a>
-            </li>
-          </ul>
-
-          <!-- Requests List -->
-          <% if (requests.length === 0) { %>
-          <div class="alert alert-info text-center">
-            <i class="fas fa-paper-plane fa-3x mb-3"></i>
-            <h5>No requests found</h5>
-            <p class="mb-0">You haven't sent any swap requests yet.</p>
-            <a href="/browse" class="btn btn-primary mt-3">
-              <i class="fas fa-search"></i> Browse Users
-            </a>
-          </div>
-          <% } else { %>
-          <div class="row">
-            <% requests.forEach(request => { %>
-            <div class="col-md-6 mb-4">
-              <div class="card request-card h-100">
-                <div class="card-body">
-                  <!-- Header with Status Badge -->
-                  <div
-                    class="d-flex justify-content-between align-items-start mb-3"
-                  >
-                    <div class="d-flex align-items-center">
-                      <img
-                        src="<%= request.toUser.profile?.avatar || '/images/default-avatar.png' %>"
-                        alt="<%= request.toUser.name %>"
-                        class="rounded-circle me-3"
-                        style="width: 50px; height: 50px; object-fit: cover"
-                      />
-                      <div>
-                        <h5 class="mb-0">
-                          <a
-                            href="/profile/<%= request.toUser._id %>"
-                            class="text-decoration-none"
-                          >
-                            <%= request.toUser.name %>
-                          </a>
-                        </h5>
-                        <small class="text-muted">
-                          <%= request.toUser.profile?.location || 'Location not
-                          set' %>
-                        </small>
-                      </div>
-                    </div>
-                    <span class="badge badge-<%= request.status %>">
-                      <%= request.status.toUpperCase() %>
-                    </span>
-                  </div>
-
-                  <!-- Skills Exchange -->
-                  <div class="mb-3">
-                    <div class="d-flex align-items-center mb-2">
-                      <span class="badge bg-success me-2">
-                        <i class="fas fa-chalkboard-teacher"></i> You'll Teach
-                      </span>
-                      <strong><%= request.skillToTeach %></strong>
-                    </div>
-                    <div class="d-flex align-items-center">
-                      <span class="badge bg-primary me-2">
-                        <i class="fas fa-book-reader"></i> You Want to Learn
-                      </span>
-                      <strong><%= request.skillToLearn %></strong>
-                    </div>
-                  </div>
-
-                  <!-- Your Message -->
-                  <div class="alert alert-light mb-3">
-                    <small class="text-muted d-block mb-1">
-                      <i class="fas fa-comment"></i> Your Message:
-                    </small>
-                    <p class="mb-0"><%= request.message %></p>
-                  </div>
-
-                  <!-- Timestamp -->
-                  <small class="text-muted">
-                    <i class="fas fa-clock"></i>
-                    Sent on <%= new
-                    Date(request.createdAt).toLocaleDateString('en-US', { year:
-                    'numeric', month: 'long', day: 'numeric' }) %>
-                  </small>
-
-                  <!-- Cancel Button (only for pending requests) -->
-                  <% if (request.status === 'pending') { %>
-                  <div class="mt-3">
-                    <button
-                      class="btn btn-outline-danger w-100"
-                      onclick="cancelRequest('<%= request._id %>')"
-                    >
-                      <i class="fas fa-ban"></i> Cancel Request
-                    </button>
-                  </div>
-                  <% } %>
-
-                  <!-- Show response date if accepted/declined -->
-                  <% if (request.respondedAt) { %>
-                  <div class="mt-2">
-                    <small class="text-muted">
-                      <i class="fas fa-info-circle"></i>
-                      Responded on <%= new
-                      Date(request.respondedAt).toLocaleDateString() %>
-                    </small>
-                  </div>
-                  <% } %>
-
-                  <!-- Start Chat Button (for accepted requests) -->
-                  <% if (request.status === 'accepted') { %>
-                  <div class="mt-3">
-                    <a
-                      href="/chat/<%= request.toUser._id %>"
-                      class="btn btn-primary w-100"
-                    >
-                      <i class="fas fa-comments"></i> Start Chat
-                    </a>
-                  </div>
-                  <% } %>
-                </div>
-              </div>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/browse">
+                            <i class="fas fa-search"></i> Browse Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/requests/inbox">
+                            <i class="fas fa-inbox"></i> Requests
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile">
+                            <i class="fas fa-user"></i> My Profile
+                        </a>
+                    </li>
+                    <li class="nav-item mt-5">
+                        <a class="nav-link text-danger" href="/api/logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
             </div>
-            <% }); %>
-          </div>
-          <% } %>
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 style="background: var(--primary-gradient);  -webkit-text-fill-color: transparent; font-weight: 800;">
+                            <i class="fas fa-paper-plane"></i> Sent Requests
+                        </h2>
+                        <p class="text-muted">Track your outgoing swap requests</p>
+                    </div>
+                    <a href="/requests/inbox" class="btn btn-outline-primary">
+                        <i class="fas fa-inbox me-2"></i> Received Requests
+                    </a>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="filter-tabs">
+                    <a href="/requests/outbox?status=all" class="btn <%= currentStatus === 'all' ? 'btn-primary' : 'btn-outline-secondary' %>">
+                        All Requests
+                    </a>
+                    <a href="/requests/outbox?status=pending" class="btn <%= currentStatus === 'pending' ? 'btn-warning' : 'btn-outline-warning' %>">
+                        Pending
+                    </a>
+                    <a href="/requests/outbox?status=accepted" class="btn <%= currentStatus === 'accepted' ? 'btn-success' : 'btn-outline-success' %>">
+                        Accepted
+                    </a>
+                    <a href="/requests/outbox?status=declined" class="btn <%= currentStatus === 'declined' ? 'btn-danger' : 'btn-outline-danger' %>">
+                        Declined
+                    </a>
+                    <a href="/requests/outbox?status=cancelled" class="btn <%= currentStatus === 'cancelled' ? 'btn-secondary' : 'btn-outline-secondary' %>">
+                        Cancelled
+                    </a>
+                </div>
+
+                <!-- Requests List -->
+                <% if (requests && requests.length > 0) { %>
+                    <% requests.forEach(request => { %>
+                    <div class="request-card <%= request.status %>">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <% if (request.toUser.profile && request.toUser.profile.avatar) { %>
+                                <img src="<%= request.toUser.profile.avatar %>" alt="<%= request.toUser.name %>" class="user-avatar" />
+                                <% } else { %>
+                                <div class="user-avatar-placeholder">
+                                    <%= request.toUser.name.charAt(0).toUpperCase() %>
+                                </div>
+                                <% } %>
+                                <h6 class="mt-2 mb-0"><%= request.toUser.name %></h6>
+                                <% if (request.toUser.profile && request.toUser.profile.location) { %>
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> <%= request.toUser.profile.location %>
+                                </small>
+                                <% } %>
+                            </div>
+
+                            <div class="col-md-7">
+                                <div class="mb-3">
+                                    <span class="status-badge status-<%= request.status %>">
+                                        <%= request.status %>
+                                    </span>
+                                    <small class="text-muted ms-2">
+                                        <i class="far fa-clock"></i> Sent <%= new Date(request.createdAt).toLocaleDateString() %>
+                                    </small>
+                                    <% if (request.respondedAt && request.status !== 'pending') { %>
+                                    <small class="text-muted ms-2">
+                                        • Responded <%= new Date(request.respondedAt).toLocaleDateString() %>
+                                    </small>
+                                    <% } %>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="mb-2">
+                                        <strong class="text-success">
+                                            <i class="fas fa-chalkboard-teacher"></i> You'll teach:
+                                        </strong>
+                                        <span class="skill-badge skill-teach"><%= request.skillToTeach %></span>
+                                    </div>
+                                    <div>
+                                        <strong class="text-primary">
+                                            <i class="fas fa-book-reader"></i> You want to learn:
+                                        </strong>
+                                        <span class="skill-badge skill-learn"><%= request.skillToLearn %></span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-light p-3 rounded">
+                                    <strong class="d-block mb-2">
+                                        <i class="fas fa-comment-dots"></i> Your Message:
+                                    </strong>
+                                    <p class="mb-0 text-muted"><em>"<%= request.message %>"</em></p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <% if (request.status === 'pending') { %>
+                                <div class="d-grid gap-2">
+                                    <div class="alert alert-warning p-2 text-center mb-2">
+                                        <i class="fas fa-hourglass-half"></i>
+                                        <small class="d-block">Waiting for response</small>
+                                    </div>
+                                    <button class="btn btn-outline-danger" onclick="cancelRequest('<%= request._id %>')">
+                                        <i class="fas fa-times"></i> Cancel Request
+                                    </button>
+                                    <a href="/profile/view/<%= request.toUser._id %>" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View Profile
+                                    </a>
+                                </div>
+                                <% } else if (request.status === 'accepted') { %>
+                                <div class="d-grid gap-2">
+                                    <div class="alert alert-success p-2 text-center mb-2">
+                                        <i class="fas fa-check-circle"></i>
+                                        <small class="d-block">Accepted!</small>
+                                    </div>
+                                    <a href="/chat" class="btn btn-primary">
+                                        <i class="fas fa-comments"></i> Start Chat
+                                    </a>
+                                    <a href="/profile/view/<%= request.toUser._id %>" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View Profile
+                                    </a>
+                                </div>
+                                <% } else if (request.status === 'declined') { %>
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-times-circle fa-2x mb-2 text-danger"></i>
+                                    <p class="mb-2">Request Declined</p>
+                                    <small class="d-block mb-2"><%= new Date(request.respondedAt || request.updatedAt).toLocaleDateString() %></small>
+                                    <a href="/browse" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-search"></i> Find Others
+                                    </a>
+                                </div>
+                                <% } else if (request.status === 'cancelled') { %>
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-ban fa-2x mb-2"></i>
+                                    <p class="mb-0">You cancelled this request</p>
+                                    <small><%= new Date(request.updatedAt).toLocaleDateString() %></small>
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="empty-state">
+                        <i class="fas fa-paper-plane"></i>
+                        <h4>No Sent Requests</h4>
+                        <p class="text-muted">
+                            <% if (currentStatus === 'pending') { %>
+                            You don't have any pending sent requests.
+                            <% } else if (currentStatus === 'accepted') { %>
+                            None of your requests have been accepted yet.
+                            <% } else if (currentStatus === 'declined') { %>
+                            None of your requests have been declined.
+                            <% } else { %>
+                            You haven't sent any swap requests yet.
+                            <% } %>
+                        </p>
+                        <a href="/browse" class="btn btn-primary mt-3">
+                            <i class="fas fa-search"></i> Browse Users & Send Requests
+                        </a>
+                    </div>
+                <% } %>
+            </div>
         </div>
-      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      async function cancelRequest(requestId) {
-        if (!confirm("Are you sure you want to cancel this request?")) {
-          return;
+        async function cancelRequest(requestId) {
+            if (!confirm('Cancel this swap request? This action cannot be undone.')) return;
+            
+            try {
+                const response = await fetch(`/requests/${requestId}/cancel`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ Request cancelled');
+                    location.reload();
+                } else {
+                    alert('❌ ' + data.message);
+                }
+            } catch (error) {
+                alert('❌ Failed to cancel request');
+            }
         }
-
-        try {
-          const response = await fetch(`/requests/${requestId}/cancel`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            alert(data.message);
-            window.location.reload();
-          } else {
-            alert(data.message || "Something went wrong");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("Failed to cancel request. Please try again.");
-        }
-      }
     </script>
-  </body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <style>
-      .request-card {
-        transition: transform 0.2s, box-shadow 0.2s;
-      }
-      .request-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      }
-      .badge-pending {
-        background-color: #ffc107;
-        color: #000;
-      }
-      .badge-accepted {
-        background-color: #28a745;
-      }
-      .badge-declined {
-        background-color: #dc3545;
-      }
-      .badge-cancelled {
-        background-color: #6c757d;
-      }
-    </style>
-  </head>
-  <body>
-    <%- include('../../partials/navbar') %>
-
-    <div class="container mt-5">
-      <div class="row">
-        <div class="col-12">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-paper-plane"></i> Sent Requests</h2>
-            <a href="/requests/inbox" class="btn btn-outline-primary">
-              <i class="fas fa-inbox"></i> Received Requests
-            </a>
-          </div>
-
-          <!-- Filter Tabs -->
-          <ul class="nav nav-tabs mb-4">
-            <li class="nav-item">
-              <a
-                class="nav-link <%= activeTab === 'all' ? 'active' : '' %>"
-                href="/requests/outbox?status=all"
-              >
-                All (<%= requests.length %>)
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= activeTab === 'pending' ? 'active' : '' %>"
-                href="/requests/outbox?status=pending"
-              >
-                Pending
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= activeTab === 'accepted' ? 'active' : '' %>"
-                href="/requests/outbox?status=accepted"
-              >
-                Accepted
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= activeTab === 'declined' ? 'active' : '' %>"
-                href="/requests/outbox?status=declined"
-              >
-                Declined
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= activeTab === 'cancelled' ? 'active' : '' %>"
-                href="/requests/outbox?status=cancelled"
-              >
-                Cancelled
-              </a>
-            </li>
-          </ul>
-
-          <!-- Requests List -->
-          <% if (requests.length === 0) { %>
-          <div class="alert alert-info text-center">
-            <i class="fas fa-paper-plane fa-3x mb-3"></i>
-            <h5>No requests found</h5>
-            <p class="mb-0">You haven't sent any swap requests yet.</p>
-            <a href="/browse" class="btn btn-primary mt-3">
-              <i class="fas fa-search"></i> Browse Users
-            </a>
-          </div>
-          <% } else { %>
-          <div class="row">
-            <% requests.forEach(request => { %>
-            <div class="col-md-6 mb-4">
-              <div class="card request-card h-100">
-                <div class="card-body">
-                  <!-- Header with Status Badge -->
-                  <div
-                    class="d-flex justify-content-between align-items-start mb-3"
-                  >
-                    <div class="d-flex align-items-center">
-                      <img
-                        src="<%= request.toUser.profile?.avatar || '/images/default-avatar.png' %>"
-                        alt="<%= request.toUser.name %>"
-                        class="rounded-circle me-3"
-                        style="width: 50px; height: 50px; object-fit: cover"
-                      />
-                      <div>
-                        <h5 class="mb-0">
-                          <a
-                            href="/profile/<%= request.toUser._id %>"
-                            class="text-decoration-none"
-                          >
-                            <%= request.toUser.name %>
-                          </a>
-                        </h5>
-                        <small class="text-muted">
-                          <%= request.toUser.profile?.location || 'Location not
-                          set' %>
-                        </small>
-                      </div>
-                    </div>
-                    <span class="badge badge-<%= request.status %>">
-                      <%= request.status.toUpperCase() %>
-                    </span>
-                  </div>
-
-                  <!-- Skills Exchange -->
-                  <div class="mb-3">
-                    <div class="d-flex align-items-center mb-2">
-                      <span class="badge bg-success me-2">
-                        <i class="fas fa-chalkboard-teacher"></i> You'll Teach
-                      </span>
-                      <strong><%= request.skillToTeach %></strong>
-                    </div>
-                    <div class="d-flex align-items-center">
-                      <span class="badge bg-primary me-2">
-                        <i class="fas fa-book-reader"></i> You Want to Learn
-                      </span>
-                      <strong><%= request.skillToLearn %></strong>
-                    </div>
-                  </div>
-
-                  <!-- Your Message -->
-                  <div class="alert alert-light mb-3">
-                    <small class="text-muted d-block mb-1">
-                      <i class="fas fa-comment"></i> Your Message:
-                    </small>
-                    <p class="mb-0"><%= request.message %></p>
-                  </div>
-
-                  <!-- Timestamp -->
-                  <small class="text-muted">
-                    <i class="fas fa-clock"></i>
-                    Sent on <%= new
-                    Date(request.createdAt).toLocaleDateString('en-US', { year:
-                    'numeric', month: 'long', day: 'numeric' }) %>
-                  </small>
-
-                  <!-- Cancel Button (only for pending requests) -->
-                  <% if (request.status === 'pending') { %>
-                  <div class="mt-3">
-                    <button
-                      class="btn btn-outline-danger w-100"
-                      onclick="cancelRequest('<%= request._id %>')"
-                    >
-                      <i class="fas fa-ban"></i> Cancel Request
-                    </button>
-                  </div>
-                  <% } %>
-
-                  <!-- Show response date if accepted/declined -->
-                  <% if (request.respondedAt) { %>
-                  <div class="mt-2">
-                    <small class="text-muted">
-                      <i class="fas fa-info-circle"></i>
-                      Responded on <%= new
-                      Date(request.respondedAt).toLocaleDateString() %>
-                    </small>
-                  </div>
-                  <% } %>
-
-                  <!-- Start Chat Button (for accepted requests) -->
-                  <% if (request.status === 'accepted') { %>
-                  <div class="mt-3">
-                    <a
-                      href="/chat/<%= request.toUser._id %>"
-                      class="btn btn-primary w-100"
-                    >
-                      <i class="fas fa-comments"></i> Start Chat
-                    </a>
-                  </div>
-                  <% } %>
-                </div>
-              </div>
-            </div>
-            <% }); %>
-          </div>
-          <% } %>
-        </div>
-      </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      async function cancelRequest(requestId) {
-        if (!confirm("Are you sure you want to cancel this request?")) {
-          return;
-        }
-
-        try {
-          const response = await fetch(`/requests/${requestId}/cancel`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            alert(data.message);
-            window.location.reload();
-          } else {
-            alert(data.message || "Something went wrong");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("Failed to cancel request. Please try again.");
-        }
-      }
-    </script>
-  </body>
+</body>
 </html>

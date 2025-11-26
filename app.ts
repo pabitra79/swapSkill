@@ -30,6 +30,8 @@ import { ProfileRouter } from "./app/router/profile.router";
 app.use(ProfileRouter);
 import { BrowseRouter } from "./app/router/browse.router";
 app.use(BrowseRouter);
+import { Swaprouter } from "./app/router/request.router";
+app.use("/requests",Swaprouter);
 
 app.listen(5000,()=>{
     console.log("Server port is 5000")

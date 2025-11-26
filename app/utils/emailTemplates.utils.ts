@@ -1,9 +1,62 @@
 import dotenv from "dotenv";
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
 const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`;
 
+// Email configuration
+const emailConfig = {
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+};
+
+// Create transporter
+const transporter = nodemailer.createTransport(emailConfig);
+
+// Verify transporter configuration
+transporter.verify((error:any) => {
+  if (error) {
+    console.error('Email transporter error:', error);
+  } else {
+    console.log('Email transporter is ready to send messages');
+  }
+});
+
+// Send email function
+export interface EmailOptions {
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+}
+
+export const sendEmail = async (options: EmailOptions): Promise<{ success: boolean; message: string }> => {
+  try {
+    const mailOptions = {
+      from: process.env.SMTP_FROM || `"SkillSwap" <${process.env.SMTP_USER}>`,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      text: options.text,
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', result.messageId);
+    return { success: true, message: 'Email sent successfully' };
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return { 
+      success: false, 
+      message: error instanceof Error ? error.message : 'Failed to send email' 
+    };
+  }
+};
 
 export const welcomeEmailTemplate = (
   name: string,
@@ -114,9 +167,6 @@ If you didn't create this account, please ignore this email.
   };
 };
 
-/**
- * Email verification success
- */
 export const verificationSuccessTemplate = (
   name: string
 ): { subject: string; html: string; text: string } => {

@@ -6,19 +6,18 @@
     <title><%= title %></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
     <style>
         :root {
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         --dark-blue: #2c3e50;
         --light-bg: #f8f9fa;
-      }
-
+        }
         * {
             font-family: 'Inter', sans-serif;
         }
-
         /* Navbar Styles - Fixed */
         .skillswap-navbar {
             background-color: var(--navbar-bg) !important;
@@ -256,7 +255,7 @@
 <body>
     <%- include('../../partials/navbar') %>
 
-    <div class="container-fluid">
+  <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
             <div class="col-md-2 sidebar">
@@ -303,30 +302,30 @@
                             <div class="col-md-4">
                                 <div class="search-box">
                                     <i class="fas fa-search"></i>
-                                    <input type="text" class="form-control" name="search" placeholder="Search by name or skill..." value="<%= searchQuery %>" />
+                                    <input type="text" class="form-control" name="search" placeholder="Search by name or skill..." value="<%= searchQuery || '' %>" />
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <select class="form-select" name="location">
                                     <option value="">All Locations</option>
-                                    <% locations.forEach(location => { %>
-                                    <option value="<%= location %>" <%= locationFilter === location ? 'selected' : '' %>><%= location %></option>
+                                    <% (locations || []).forEach(location => { %>
+                                    <option value="<%= location %>" <%= (locationFilter === location) ? 'selected' : '' %>><%= location %></option>
                                     <% }); %>
                                 </select>
                             </div>
                             <div class="col-md-2">
                                 <select class="form-select" name="experience">
                                     <option value="">All Levels</option>
-                                    <% experienceLevels.forEach(level => { %>
-                                    <option value="<%= level %>" <%= experienceFilter === level ? 'selected' : '' %>><%= level %></option>
+                                    <% (experienceLevels || []).forEach(level => { %>
+                                    <option value="<%= level %>" <%= (experienceFilter === level) ? 'selected' : '' %>><%= level %></option>
                                     <% }); %>
                                 </select>
                             </div>
                             <div class="col-md-2">
                                 <select class="form-select" name="sort">
-                                    <option value="match" <%= sortBy === 'match' ? 'selected' : '' %>>Best Match</option>
-                                    <option value="newest" <%= sortBy === 'newest' ? 'selected' : '' %>>Newest</option>
-                                    <option value="name" <%= sortBy === 'name' ? 'selected' : '' %>>Name</option>
+                                    <option value="match" <%= (sortBy === 'match') ? 'selected' : '' %>>Best Match</option>
+                                    <option value="newest" <%= (sortBy === 'newest') ? 'selected' : '' %>>Newest</option>
+                                    <option value="name" <%= (sortBy === 'name') ? 'selected' : '' %>>Name</option>
                                 </select>
                             </div>
                             <div class="col-md-1">
@@ -339,7 +338,7 @@
                 </div>
 
                 <!-- User Cards Grid -->
-                <% if (users.length > 0) { %>
+                <% if (users && users.length > 0) { %>
                 <div class="row">
                     <% users.forEach(item => { %>
                     <div class="col-md-6 col-lg-4 mb-4">
@@ -401,13 +400,14 @@
                                     <a href="/profile/view/<%= item.user._id %>" class="btn btn-outline-primary btn-sm">
                                         <i class="fas fa-eye me-1"></i> View Profile
                                     </a>
-                                    <button class="btn btn-primary btn-sm send-request-btn"
-                                            data-user-id="<%= item.user._id %>"
-                                            data-user-name="<%= item.user.name %>"
-                                            data-user-skills="<%- JSON.stringify(item.user.profile?.teachSkills || []) %>"
-                                            data-my-skills="<%- JSON.stringify(currentUser.profile?.teachSkills || []) %>">
+                                    <!-- FIXED: Safe JSON stringification -->
+                                            <button class="btn btn-primary btn-sm send-request-btn"
+                                        data-user-id="<%= item.user._id %>"
+                                        data-user-name="<%= item.user.name %>"
+                                        data-they-can-teach="<%= item.user.profile && item.user.profile.teachSkills ? JSON.stringify(item.user.profile.teachSkills) : '[]' %>"
+                                        data-they-want-to-learn="<%= item.user.profile && item.user.profile.learnSkills ? JSON.stringify(item.user.profile.learnSkills) : '[]' %>">
                                         <i class="fas fa-handshake me-1"></i> Send Request
-                                    </button>
+                                        </button>
                                 </div>
                             </div>
                         </div>
@@ -489,83 +489,183 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔧 Browse page loaded - initializing send request functionality');
+        
         // Character counter
-        document.getElementById("message")?.addEventListener("input", function() {
-            document.getElementById("charCount").textContent = this.value.length;
+        const messageInput = document.getElementById("message");
+        const charCount = document.getElementById("charCount");
+        
+        if (messageInput && charCount) {
+            messageInput.addEventListener("input", function() {
+                charCount.textContent = this.value.length;
+            });
+        }
+
+        // Debug: Check what skills data is available
+        console.log('🔍 Debug: Checking skills data on page load');
+        
+        // Check all user cards
+        const userCards = document.querySelectorAll('.send-request-btn');
+        userCards.forEach((btn, index) => {
+            const userId = btn.dataset.userId;
+            const userName = btn.dataset.userName;
+            const theyCanTeach = btn.dataset.theyCanTeach ? JSON.parse(btn.dataset.theyCanTeach) : [];
+            const theyWantToLearn = btn.dataset.theyWantToLearn ? JSON.parse(btn.dataset.theyWantToLearn) : [];
+            
+            console.log(`👤 User ${index + 1}: ${userName} (${userId})`);
+            console.log(`   They can teach:`, theyCanTeach);
+            console.log(`   They want to learn:`, theyWantToLearn);
+            console.log(`   Match data:`, {
+                theyCanHelp: btn.closest('.card')?.querySelector('.skill-teach')?.textContent,
+                youCanHelp: btn.closest('.card')?.querySelector('.skill-learn')?.textContent
+            });
         });
 
         // Send request functionality
-        document.querySelectorAll('.send-request-btn').forEach(btn => {
+        const sendRequestButtons = document.querySelectorAll('.send-request-btn');
+        console.log('🔧 Found', sendRequestButtons.length, 'send request buttons');
+        
+        sendRequestButtons.forEach(btn => {
             btn.addEventListener('click', function() {
+                console.log('🔧 Send request button clicked');
+                
                 const userId = this.dataset.userId;
                 const userName = this.dataset.userName;
-                const userSkills = JSON.parse(this.dataset.userSkills);
-                const mySkills = JSON.parse(this.dataset.mySkills);
+                
+                // SAFE JSON parsing with error handling
+                let theyCanTeach = [];
+                let theyWantToLearn = [];
+                
+                try {
+                    theyCanTeach = this.dataset.theyCanTeach ? JSON.parse(this.dataset.theyCanTeach) : [];
+                    console.log('✅ They can teach:', theyCanTeach);
+                } catch (e) {
+                    console.error('❌ Error parsing theyCanTeach:', e, 'Raw data:', this.dataset.theyCanTeach);
+                    theyCanTeach = [];
+                }
+                
+                try {
+                    theyWantToLearn = this.dataset.theyWantToLearn ? JSON.parse(this.dataset.theyWantToLearn) : [];
+                    console.log('✅ They want to learn:', theyWantToLearn);
+                } catch (e) {
+                    console.error('❌ Error parsing theyWantToLearn:', e, 'Raw data:', this.dataset.theyWantToLearn);
+                    theyWantToLearn = [];
+                }
+                
+                console.log('🔧 User data:', { userId, userName, theyCanTeach, theyWantToLearn });
                 
                 document.getElementById("toUserId").value = userId;
                 document.getElementById("recipientName").textContent = userName;
 
+                // CORRECTED: Populate skills dropdowns with proper logic
                 const teachSelect = document.getElementById("skillToTeach");
-                teachSelect.innerHTML = '<option value="">Select a skill...</option>';
-                if (mySkills && mySkills.length > 0) {
-                    mySkills.forEach(skill => teachSelect.innerHTML += `<option value="${skill}">${skill}</option>`);
-                }
-
                 const learnSelect = document.getElementById("skillToLearn");
-                learnSelect.innerHTML = '<option value="">Select a skill...</option>';
-                if (userSkills && userSkills.length > 0) {
-                    userSkills.forEach(skill => learnSelect.innerHTML += `<option value="${skill}">${skill}</option>`);
+                
+                if (teachSelect) {
+                    teachSelect.innerHTML = '<option value="">Select a skill...</option>';
+                    if (theyWantToLearn && theyWantToLearn.length > 0) {
+                        // I can teach what THEY want to learn
+                        theyWantToLearn.forEach(skill => {
+                            teachSelect.innerHTML += `<option value="${skill}">${skill}</option>`;
+                        });
+                        console.log('✅ Teach dropdown populated with:', theyWantToLearn.length, 'skills');
+                    } else {
+                        teachSelect.innerHTML += '<option value="" disabled>This user has no learning goals</option>';
+                        console.log('❌ No skills to teach - user has no learning goals');
+                    }
                 }
 
+                if (learnSelect) {
+                    learnSelect.innerHTML = '<option value="">Select a skill...</option>';
+                    if (theyCanTeach && theyCanTeach.length > 0) {
+                        // I want to learn what THEY can teach
+                        theyCanTeach.forEach(skill => {
+                            learnSelect.innerHTML += `<option value="${skill}">${skill}</option>`;
+                        });
+                        console.log('✅ Learn dropdown populated with:', theyCanTeach.length, 'skills');
+                    } else {
+                        learnSelect.innerHTML += '<option value="" disabled>This user has no teaching skills</option>';
+                        console.log('❌ No skills to learn - user has no teaching skills');
+                    }
+                }
+
+                // Reset form
                 document.getElementById("sendRequestForm").reset();
-                document.getElementById("charCount").textContent = "0";
-                new bootstrap.Modal(document.getElementById("sendRequestModal")).show();
+                if (charCount) charCount.textContent = "0";
+                
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById("sendRequestModal"));
+                modal.show();
             });
         });
 
         // Form submission
-        document.getElementById("sendRequestForm")?.addEventListener("submit", async function(e) {
-            e.preventDefault();
-            const formData = {
-                toUserId: document.getElementById("toUserId").value,
-                skillToTeach: document.getElementById("skillToTeach").value,
-                skillToLearn: document.getElementById("skillToLearn").value,
-                message: document.getElementById("message").value,
-            };
+        const sendRequestForm = document.getElementById("sendRequestForm");
+        if (sendRequestForm) {
+            sendRequestForm.addEventListener("submit", async function(e) {
+                e.preventDefault();
+                console.log('🔧 Form submission started');
+                
+                const formData = {
+                    toUserId: document.getElementById("toUserId").value,
+                    skillToTeach: document.getElementById("skillToTeach").value,
+                    skillToLearn: document.getElementById("skillToLearn").value,
+                    message: document.getElementById("message").value,
+                };
 
-            if (!formData.skillToTeach || !formData.skillToLearn || !formData.message) {
-                alert("Please fill in all required fields");
-                return;
-            }
+                console.log('🔧 Form data:', formData);
 
-            try {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-
-                const response = await fetch("/requests/send", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formData),
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    alert("✅ " + data.message);
-                    bootstrap.Modal.getInstance(document.getElementById("sendRequestModal")).hide();
-                    this.reset();
-                } else {
-                    alert("❌ " + (data.message || "Failed to send request"));
+                if (!formData.skillToTeach || !formData.skillToLearn || !formData.message) {
+                    alert("Please fill in all required fields");
+                    return;
                 }
-            } catch (error) {
-                alert("❌ Failed to send request. Please try again.");
-            } finally {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Request';
-            }
-        });
-    </script>
+
+                if (formData.message.length < 10) {
+                    alert("Message must be at least 10 characters long");
+                    return;
+                }
+
+                try {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+                    console.log('🔧 Sending request to server...');
+                    const response = await fetch("/requests/send", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(formData),
+                    });
+
+                    const data = await response.json();
+                    console.log('🔧 Server response:', data);
+                    
+                    if (data.success) {
+                        alert("✅ " + data.message);
+                        bootstrap.Modal.getInstance(document.getElementById("sendRequestModal")).hide();
+                        this.reset();
+                    } else {
+                        alert("❌ " + (data.message || "Failed to send request"));
+                    }
+                } catch (error) {
+                    console.error('🔧 Request failed:', error);
+                    alert("❌ Failed to send request. Please try again.");
+                } finally {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Send Request';
+                    }
+                }
+            });
+        } else {
+            console.error('🔧 Send request form not found');
+        }
+    });
+</script>
 </body>
 </html>

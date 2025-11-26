@@ -1,0 +1,143 @@
+import mongoose from 'mongoose';
+import { SwapRequest } from '../models/swapRequest.model';
+import { ISwapRequest } from '../interfaces/IswapRequest.interface';
+
+export class SwapRequestRepository {
+    // Create a new swap request
+    async create(data: Partial<ISwapRequest>): Promise<ISwapRequest> {
+        console.log('💾 Repository create - Raw data:', data);
+        
+        try {
+            // Convert string IDs to ObjectIds
+            const requestData = {
+                ...data,
+                fromUser: new mongoose.Types.ObjectId(data.fromUser as any),
+                toUser: new mongoose.Types.ObjectId(data.toUser as any)
+            };
+            
+            console.log('💾 Repository create - Converted data:', requestData);
+            
+            const request = await SwapRequest.create(requestData);
+            console.log('✅ Repository create - Success! ID:', request._id);
+            return request;
+        } catch (error) {
+            console.error('❌ Repository create - Error:', error);
+            throw error;
+        }
+    }
+
+    // Find request by ID
+    async findById(id: string): Promise<ISwapRequest | null> {
+        return await SwapRequest.findById(id)
+            .populate('fromUser', 'name email profile')
+            .populate('toUser', 'name email profile');
+    }
+
+    // Check if request already exists between two users
+    async findExisting(fromUserId: string, toUserId: string): Promise<ISwapRequest | null> {
+        console.log(' Repository findExisting - From:', fromUserId, 'To:', toUserId);
+        const result = await SwapRequest.findOne({
+            fromUser: new mongoose.Types.ObjectId(fromUserId),
+            toUser: new mongoose.Types.ObjectId(toUserId),
+            status: { $in: ['pending', 'accepted'] }
+        });
+        console.log(' Repository findExisting - Found:', result ? 'Yes' : 'No');
+        return result;
+    }
+
+    // Get received requests (inbox)
+    async getInbox(userId: string, status?: string): Promise<ISwapRequest[]> {
+        console.log(' Repository getInbox - userId:', userId);
+        
+        const query: any = { toUser: new mongoose.Types.ObjectId(userId) };
+        
+        if (status && status !== 'all') {
+            query.status = status;
+        }
+
+        console.log('Repository query:', query);
+
+        const requests = await SwapRequest.find(query)
+            .populate('fromUser', 'name email profile')
+            .sort({ createdAt: -1 });
+        
+        console.log(' Repository found:', requests.length, 'requests');
+        
+        return requests;
+    }
+
+    // Get sent requests (outbox)
+    async getOutbox(userId: string, status?: string): Promise<ISwapRequest[]> {
+        const query: any = { fromUser: new mongoose.Types.ObjectId(userId) };
+        
+        if (status && status !== 'all') {
+            query.status = status;
+        }
+
+        return await SwapRequest.find(query)
+            .populate('toUser', 'name email profile')
+            .sort({ createdAt: -1 });
+    }
+
+    // Find pending request by ID and recipient
+    async findPendingByIdAndRecipient(requestId: string, userId: string): Promise<ISwapRequest | null> {
+        return await SwapRequest.findOne({
+            _id: requestId,
+            toUser: new mongoose.Types.ObjectId(userId),
+            status: 'pending'
+        }).populate('fromUser', 'name email profile');
+    }
+
+    // Find pending request by ID and sender
+    async findPendingByIdAndSender(requestId: string, userId: string): Promise<ISwapRequest | null> {
+        return await SwapRequest.findOne({
+            _id: requestId,
+            fromUser: new mongoose.Types.ObjectId(userId),
+            status: 'pending'
+        });
+    }
+
+    // Update request status
+    async updateStatus(requestId: string, status: ISwapRequest['status']): Promise<ISwapRequest | null> {
+        const updateData: any = { status };
+        
+        if (status === 'accepted' || status === 'declined') {
+            updateData.respondedAt = new Date();
+        }
+
+        return await SwapRequest.findByIdAndUpdate(
+            requestId,
+            updateData,
+            { new: true }
+        );
+    }
+
+    // Count pending requests for a user
+    async countPending(userId: string): Promise<number> {
+        return await SwapRequest.countDocuments({
+            toUser: new mongoose.Types.ObjectId(userId),
+            status: 'pending'
+        });
+    }
+
+    // Get all requests between two users
+    async getRequestsBetweenUsers(userId1: string, userId2: string): Promise<ISwapRequest[]> {
+        const user1ObjectId = new mongoose.Types.ObjectId(userId1);
+        const user2ObjectId = new mongoose.Types.ObjectId(userId2);
+        
+        return await SwapRequest.find({
+            $or: [
+                { fromUser: user1ObjectId, toUser: user2ObjectId },
+                { fromUser: user2ObjectId, toUser: user1ObjectId }
+            ]
+        }).sort({ createdAt: -1 });
+    }
+
+    // Delete request
+    async delete(requestId: string): Promise<boolean> {
+        const result = await SwapRequest.findByIdAndDelete(requestId);
+        return !!result;
+    }
+}
+
+export const swapRequestRepository = new SwapRequestRepository();

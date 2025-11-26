@@ -1,212 +1,439 @@
-<!-- views/pages/requests/inbox.ejs -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        .request-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .request-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-        .badge-pending {
-            background-color: #ffc107;
-            color: #000;
-        }
-        .badge-accepted {
-            background-color: #28a745;
-        }
-        .badge-declined {
-            background-color: #dc3545;
-        }
+      :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      }
+      * {
+        font-family: "Inter", sans-serif;
+      }
+      body {
+        background: #f8f9fa;
+      }
+
+      .sidebar {
+        background: rgba(30, 30, 122, 0.95);
+        min-height: 100vh;
+        padding: 30px 15px;
+      }
+      .sidebar .nav-link {
+        color: #d1d5db !important;
+        padding: 15px 20px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+      .sidebar .nav-link:hover,
+      .sidebar .nav-link.active {
+        background: var(--primary-gradient);
+        color: white !important;
+        transform: translateX(8px);
+      }
+
+      .request-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid transparent;
+      }
+      .request-card.pending {
+        border-left-color: #f59e0b;
+      }
+      .request-card.accepted {
+        border-left-color: #10b981;
+      }
+      .request-card.declined {
+        border-left-color: #ef4444;
+      }
+      .request-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .user-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #667eea;
+      }
+      .user-avatar-placeholder {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border: 3px solid white;
+      }
+
+      .skill-badge {
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+        margin: 5px;
+      }
+      .skill-teach {
+        background: #d4edda;
+        color: #155724;
+      }
+      .skill-learn {
+        background: #cce5ff;
+        color: #004085;
+      }
+
+      .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .status-accepted {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .status-declined {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .filter-tabs {
+        background: white;
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .filter-tabs .btn {
+        margin-right: 10px;
+        border-radius: 20px;
+        font-weight: 600;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .empty-state i {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 20px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <%- include('../../partials/navbar') %>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>
-                        <i class="fas fa-inbox"></i> Received Requests
-                        <% if (pendingCount > 0) { %>
-                            <span class="badge bg-danger"><%= pendingCount %></span>
-                        <% } %>
-                    </h2>
-                    <a href="/requests/outbox" class="btn btn-outline-primary">
-                        <i class="fas fa-paper-plane"></i> Sent Requests
-                    </a>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="/dashboard">
+                <i class="fas fa-home"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/browse">
+                <i class="fas fa-search"></i> Browse Users
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/requests/inbox">
+                <i class="fas fa-inbox"></i> Requests <% if (pendingCount > 0) {
+                %>
+                <span class="badge bg-danger ms-2"><%= pendingCount %></span>
+                <% } %>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/profile">
+                <i class="fas fa-user"></i> My Profile
+              </a>
+            </li>
+            <li class="nav-item mt-5">
+              <a class="nav-link text-danger" href="/api/logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 p-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2
+                style="
+                  background: var(--primary-gradient);
+                  -webkit-text-fill-color: transparent;
+                  font-weight: 800;
+                "
+              >
+                <i class="fas fa-inbox"></i> Received Requests
+              </h2>
+              <p class="text-muted">Manage your incoming swap requests</p>
+            </div>
+            <a href="/requests/outbox" class="btn btn-outline-primary">
+              <i class="fas fa-paper-plane me-2"></i> Sent Requests
+            </a>
+          </div>
+
+          <!-- Filter Tabs -->
+          <div class="filter-tabs">
+            <a
+              href="/requests/inbox?status=all"
+              class="btn <%= currentStatus === 'all' ? 'btn-primary' : 'btn-outline-secondary' %>"
+            >
+              All Requests
+            </a>
+            <a
+              href="/requests/inbox?status=pending"
+              class="btn <%= currentStatus === 'pending' ? 'btn-warning' : 'btn-outline-warning' %>"
+            >
+              Pending <% if (pendingCount > 0) { %><span
+                class="badge bg-danger ms-1"
+                ><%= pendingCount %></span
+              ><% } %>
+            </a>
+            <a
+              href="/requests/inbox?status=accepted"
+              class="btn <%= currentStatus === 'accepted' ? 'btn-success' : 'btn-outline-success' %>"
+            >
+              Accepted
+            </a>
+            <a
+              href="/requests/inbox?status=declined"
+              class="btn <%= currentStatus === 'declined' ? 'btn-danger' : 'btn-outline-danger' %>"
+            >
+              Declined
+            </a>
+          </div>
+
+          <!-- Requests List -->
+          <% if (requests && requests.length > 0) { %> <%
+          requests.forEach(request => { %>
+          <div class="request-card <%= request.status %>">
+            <div class="row align-items-center">
+              <div class="col-md-2 text-center">
+                <% if (request.fromUser.profile &&
+                request.fromUser.profile.avatar) { %>
+                <img
+                  src="<%= request.fromUser.profile.avatar %>"
+                  alt="<%= request.fromUser.name %>"
+                  class="user-avatar"
+                />
+                <% } else { %>
+                <div class="user-avatar-placeholder">
+                  <%= request.fromUser.name.charAt(0).toUpperCase() %>
+                </div>
+                <% } %>
+                <h6 class="mt-2 mb-0"><%= request.fromUser.name %></h6>
+                <% if (request.fromUser.profile &&
+                request.fromUser.profile.location) { %>
+                <small class="text-muted">
+                  <i class="fas fa-map-marker-alt"></i> <%=
+                  request.fromUser.profile.location %>
+                </small>
+                <% } %>
+              </div>
+
+              <div class="col-md-7">
+                <div class="mb-3">
+                  <span class="status-badge status-<%= request.status %>">
+                    <%= request.status %>
+                  </span>
+                  <small class="text-muted ms-2">
+                    <i class="far fa-clock"></i> <%= new
+                    Date(request.createdAt).toLocaleDateString() %>
+                  </small>
                 </div>
 
-                <!-- Filter Tabs -->
-                <ul class="nav nav-tabs mb-4">
-                    <li class="nav-item">
-                        <a class="nav-link <%= activeTab === 'all' ? 'active' : '' %>" 
-                           href="/requests/inbox?status=all">
-                            All (<%= requests.length %>)
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <%= activeTab === 'pending' ? 'active' : '' %>" 
-                           href="/requests/inbox?status=pending">
-                            Pending 
-                            <% if (pendingCount > 0) { %>
-                                <span class="badge bg-warning text-dark"><%= pendingCount %></span>
-                            <% } %>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <%= activeTab === 'accepted' ? 'active' : '' %>" 
-                           href="/requests/inbox?status=accepted">
-                            Accepted
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <%= activeTab === 'declined' ? 'active' : '' %>" 
-                           href="/requests/inbox?status=declined">
-                            Declined
-                        </a>
-                    </li>
-                </ul>
+                <div class="mb-3">
+                  <div class="mb-2">
+                    <strong class="text-success">
+                      <i class="fas fa-chalkboard-teacher"></i> They'll teach
+                      you:
+                    </strong>
+                    <span class="skill-badge skill-teach"
+                      ><%= request.skillToTeach %></span
+                    >
+                  </div>
+                  <div>
+                    <strong class="text-primary">
+                      <i class="fas fa-book-reader"></i> They want to learn:
+                    </strong>
+                    <span class="skill-badge skill-learn"
+                      ><%= request.skillToLearn %></span
+                    >
+                  </div>
+                </div>
 
-                <!-- Requests List -->
-                <% if (requests.length === 0) { %>
-                    <div class="alert alert-info text-center">
-                        <i class="fas fa-inbox fa-3x mb-3"></i>
-                        <h5>No requests found</h5>
-                        <p class="mb-0">You haven't received any swap requests yet.</p>
-                    </div>
+                <div class="bg-light p-3 rounded">
+                  <strong class="d-block mb-2">
+                    <i class="fas fa-comment-dots"></i> Message:
+                  </strong>
+                  <p class="mb-0 text-muted">
+                    <em>"<%= request.message %>"</em>
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <% if (request.status === 'pending') { %>
+                <div class="d-grid gap-2">
+                  <button
+                    class="btn btn-success"
+                    onclick="acceptRequest('<%= request._id %>')"
+                  >
+                    <i class="fas fa-check"></i> Accept
+                  </button>
+                  <button
+                    class="btn btn-danger"
+                    onclick="declineRequest('<%= request._id %>')"
+                  >
+                    <i class="fas fa-times"></i> Decline
+                  </button>
+                  <a
+                    href="/profile/view/<%= request.fromUser._id %>"
+                    class="btn btn-outline-primary"
+                  >
+                    <i class="fas fa-eye"></i> View Profile
+                  </a>
+                </div>
+                <% } else if (request.status === 'accepted') { %>
+                <div class="d-grid gap-2">
+                  <a href="/chat" class="btn btn-primary">
+                    <i class="fas fa-comments"></i> Start Chat
+                  </a>
+                  <a
+                    href="/profile/view/<%= request.fromUser._id %>"
+                    class="btn btn-outline-primary"
+                  >
+                    <i class="fas fa-eye"></i> View Profile
+                  </a>
+                </div>
                 <% } else { %>
-                    <div class="row">
-                        <% requests.forEach(request => { %>
-                            <div class="col-md-6 mb-4">
-                                <div class="card request-card h-100">
-                                    <div class="card-body">
-                                        <!-- Header with Status Badge -->
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="<%= request.fromUser.profile?.avatar || '/images/default-avatar.png' %>" 
-                                                     alt="<%= request.fromUser.name %>"
-                                                     class="rounded-circle me-3"
-                                                     style="width: 50px; height: 50px; object-fit: cover;">
-                                                <div>
-                                                    <h5 class="mb-0">
-                                                        <a href="/profile/<%= request.fromUser._id %>" class="text-decoration-none">
-                                                            <%= request.fromUser.name %>
-                                                        </a>
-                                                    </h5>
-                                                    <small class="text-muted">
-                                                        <%= request.fromUser.profile?.location || 'Location not set' %>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                            <span class="badge badge-<%= request.status %>">
-                                                <%= request.status.toUpperCase() %>
-                                            </span>
-                                        </div>
-
-                                        <!-- Skills Exchange -->
-                                        <div class="mb-3">
-                                            <div class="d-flex align-items-center mb-2">
-                                                <span class="badge bg-success me-2">
-                                                    <i class="fas fa-chalkboard-teacher"></i> Will Teach
-                                                </span>
-                                                <strong><%= request.skillToTeach %></strong>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <span class="badge bg-primary me-2">
-                                                    <i class="fas fa-book-reader"></i> Wants to Learn
-                                                </span>
-                                                <strong><%= request.skillToLearn %></strong>
-                                            </div>
-                                        </div>
-
-                                        <!-- Message -->
-                                        <div class="alert alert-light mb-3">
-                                            <small class="text-muted d-block mb-1">
-                                                <i class="fas fa-comment"></i> Message:
-                                            </small>
-                                            <p class="mb-0"><%= request.message %></p>
-                                        </div>
-
-                                        <!-- Timestamp -->
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock"></i>
-                                            <%= new Date(request.createdAt).toLocaleDateString('en-US', { 
-                                                year: 'numeric', 
-                                                month: 'long', 
-                                                day: 'numeric' 
-                                            }) %>
-                                        </small>
-
-                                        <!-- Action Buttons (only for pending requests) -->
-                                        <% if (request.status === 'pending') { %>
-                                            <div class="mt-3 d-flex gap-2">
-                                                <button class="btn btn-success flex-fill" 
-                                                        onclick="handleRequest('<%= request._id %>', 'accept')">
-                                                    <i class="fas fa-check"></i> Accept
-                                                </button>
-                                                <button class="btn btn-danger flex-fill" 
-                                                        onclick="handleRequest('<%= request._id %>', 'decline')">
-                                                    <i class="fas fa-times"></i> Decline
-                                                </button>
-                                            </div>
-                                        <% } %>
-
-                                        <!-- Show response date if accepted/declined -->
-                                        <% if (request.respondedAt) { %>
-                                            <div class="mt-2">
-                                                <small class="text-muted">
-                                                    <i class="fas fa-info-circle"></i>
-                                                    Responded on <%= new Date(request.respondedAt).toLocaleDateString() %>
-                                                </small>
-                                            </div>
-                                        <% } %>
-                                    </div>
-                                </div>
-                            </div>
-                        <% }); %>
-                    </div>
+                <div class="text-center text-muted">
+                  <i class="fas fa-info-circle fa-2x mb-2"></i>
+                  <p class="mb-0">Request <%= request.status %></p>
+                  <small
+                    ><%= new Date(request.respondedAt ||
+                    request.updatedAt).toLocaleDateString() %></small
+                  >
+                </div>
                 <% } %>
+              </div>
             </div>
+          </div>
+          <% }); %> <% } else { %>
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h4>No Requests Found</h4>
+            <p class="text-muted">
+              <% if (currentStatus === 'pending') { %> You don't have any
+              pending requests right now. <% } else if (currentStatus ===
+              'accepted') { %> You haven't accepted any requests yet. <% } else
+              if (currentStatus === 'declined') { %> You haven't declined any
+              requests. <% } else { %> You haven't received any swap requests
+              yet. <% } %>
+            </p>
+            <a href="/browse" class="btn btn-primary mt-3">
+              <i class="fas fa-search"></i> Browse Users
+            </a>
+          </div>
+          <% } %>
         </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        async function handleRequest(requestId, action) {
-            if (!confirm(`Are you sure you want to ${action} this request?`)) {
-                return;
-            }
+      async function acceptRequest(requestId) {
+        if (
+          !confirm(
+            "Accept this swap request? You can start chatting after accepting."
+          )
+        )
+          return;
 
-            try {
-                const response = await fetch(`/requests/${requestId}/${action}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+        try {
+          const response = await fetch(`/requests/${requestId}/accept`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
 
-                const data = await response.json();
-
-                if (data.success) {
-                    alert(data.message);
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Something went wrong');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to process request. Please try again.');
-            }
+          const data = await response.json();
+          if (data.success) {
+            alert("✅ " + data.message);
+            location.reload();
+          } else {
+            alert("❌ " + data.message);
+          }
+        } catch (error) {
+          alert("❌ Failed to accept request");
         }
+      }
+
+      async function declineRequest(requestId) {
+        if (
+          !confirm("Decline this swap request? This action cannot be undone.")
+        )
+          return;
+
+        try {
+          const response = await fetch(`/requests/${requestId}/decline`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            alert("Request declined");
+            location.reload();
+          } else {
+            alert("❌ " + data.message);
+          }
+        } catch (error) {
+          alert("❌ Failed to decline request");
+        }
+      }
     </script>
-</body>
+  </body>
 </html>

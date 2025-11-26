@@ -1,3 +1,4 @@
+// types/session.types.ts
 import { SessionData } from 'express-session';
 
 export interface CustomSession extends SessionData {

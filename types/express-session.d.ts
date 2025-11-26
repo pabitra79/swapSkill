@@ -1,6 +1,8 @@
-import "express-session";
+// types/express.d.ts
+import 'express';
+import { SessionData } from 'express-session';
 
-declare module "express-session" {
+declare module 'express-session' {
   interface SessionData {
     user?: {
       id: string;
@@ -8,5 +10,15 @@ declare module "express-session" {
       name: string;
     };
     token?: string;
+  }
+}
+
+declare module 'express' {
+  interface Request {
+    user?: {
+      _id: string;
+      email: string;
+      name: string;
+    };
   }
 }
