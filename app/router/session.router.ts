@@ -13,4 +13,7 @@ sessionRouter.get('/balance', sessionController.getUserBalance);
 sessionRouter.get('/stats', sessionController.getDashboardStats);
 sessionRouter.get('/api/user/stats', sessionController.getDashboardStats);
 
+sessionRouter.get('/rate/:sessionId', sessionController.showRatingForm);
+sessionRouter.post('/rate/:sessionId', sessionController.submitRating);
+
 export { sessionRouter };

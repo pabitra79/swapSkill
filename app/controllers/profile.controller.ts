@@ -6,6 +6,7 @@ import { profileSchema } from '../validators/profile.validators';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import sessionRepository from '../repository/session.repository';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -194,75 +195,81 @@ class ProfileController {
   ];
 
   viewProfile = async (req: Request, res: Response): Promise<any> => {
-    try {
-      const session = req.session as CustomSession;
-      const userId = req.params.userId;
-      
-      let user;
-      let isOwnProfile = false;
+  try {
+    const session = req.session as CustomSession;
+    const userId = req.params.userId;
+    
+    let user;
+    let isOwnProfile = false;
 
-      if (userId) {
-        user = await userRepository.findUserById(userId);
-        if (!user) {
-          return res.status(404).render('pages/error', {
-            title: 'User Not Found',
-            message: 'The requested profile does not exist.'
-          });
-        }
-        isOwnProfile = session.user?.email === user.email;
-      } else {
-        user = await userRepository.findUserbyEmail(session.user!.email);
-        if (!user) {
-          return res.redirect('/api/login');
-        }
-        isOwnProfile = true;
+    if (userId) {
+      user = await userRepository.findUserById(userId);
+      if (!user) {
+        return res.status(404).render('pages/error', {
+          title: 'User Not Found',
+          message: 'The requested profile does not exist.'
+        });
       }
+      isOwnProfile = session.user?.email === user.email;
+    } else {
+      user = await userRepository.findUserbyEmail(session.user!.email);
+      if (!user) {
+        return res.redirect('/api/login');
+      }
+      isOwnProfile = true;
+    }
 
-      res.render('pages/profile/view-profile', {
-        title: `${user.name}'s Profile - SkillSwap`,
-        userProfile: {
-          id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          profileImage: user.profile?.avatar || '',
-          profile: user.profile || {
-            bio: '',
-            teachSkills: [],
-            learnSkills: [],
-            availability: '',
-            location: '',
-            avatar: '',
-            language: 'English',
-            timezone: 'IST',
-            experienceLevel: '',
-            hourlyRate: null,
-            website: '',
-            socialLinks: {
-              github: '',
-              linkedin: '',
-              twitter: ''
-            }
-          },
-          stats: user.stats || {
-            completedSessions: 0,
-            hoursTaught: 0,
-            hoursLearned: 0,
-            responseRate: 0
-          },
-          createdAt: user.createdAt
+    // 🔥 CALCULATE REAL STATS FROM SESSIONS
+    const userStats = await sessionRepository.calculateUserBalance(user._id.toString());
+
+    // Format the stats for the profile
+    const profileStats = {
+      completedSessions: userStats.totalSessions || 0,
+      hoursTaught: userStats.hoursTaught || 0,
+      hoursLearned: userStats.hoursLearned || 0,
+      responseRate: user.stats?.responseRate || 0 // Keep existing response rate
+    };
+
+    res.render('pages/profile/view-profile', {
+      title: `${user.name}'s Profile - SkillSwap`,
+      userProfile: {
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        profileImage: user.profile?.avatar || '',
+        profile: user.profile || {
+          bio: '',
+          teachSkills: [],
+          learnSkills: [],
+          availability: '',
+          location: '',
+          avatar: '',
+          language: 'English',
+          timezone: 'IST',
+          experienceLevel: '',
+          hourlyRate: null,
+          website: '',
+          socialLinks: {
+            github: '',
+            linkedin: '',
+            twitter: ''
+          }
         },
-        isOwnProfile,
-        currentUser: {
+        stats: profileStats, // 🔥 Use real calculated stats
+        createdAt: user.createdAt
+      },
+      isOwnProfile,
+      currentUser: {
         id: session.user?.id,
         email: session.user?.email,
         name: session.user?.name
       }
-      });
-    } catch (error) {
-      console.error('Error loading profile:', error);
-      return res.redirect('/dashboard');
-    }
-  };
+    });
+  } catch (error) {
+    console.error('Error loading profile:', error);
+    return res.redirect('/dashboard');
+  }
+};
 }
 
 export const profileController = new ProfileController();

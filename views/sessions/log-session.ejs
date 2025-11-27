@@ -306,7 +306,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/sessions">
+              <a class="nav-link active" href="/sessions/history">
                 <i class="fas fa-calendar-alt"></i> Sessions
               </a>
             </li>
@@ -538,13 +538,14 @@
             const result = await response.json();
 
             if (response.ok) {
-              // Success
+              // Success - FIXED URL
               showAlert(
                 "success",
                 "✅ Session logged successfully! Redirecting to rating..."
               );
               setTimeout(() => {
-                window.location.href = `/ratings/rate?sessionId=${result.sessionId}`;
+                // CORRECT: Use sessions/rate/:sessionId
+                window.location.href = `/sessions/rate/${result.sessionId}`;
               }, 1500);
             } else {
               // Error
@@ -559,14 +560,14 @@
       function showAlert(type, message) {
         const alertContainer = document.getElementById("alertContainer");
         alertContainer.innerHTML = `
-        <div class="alert alert-${type} alert-custom alert-dismissible fade show" role="alert">
-          <i class="fas fa-${
-            type === "success" ? "check-circle" : "exclamation-triangle"
-          } me-2"></i>
-          ${message}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      `;
+      <div class="alert alert-${type} alert-custom alert-dismissible fade show" role="alert">
+        <i class="fas fa-${
+          type === "success" ? "check-circle" : "exclamation-triangle"
+        } me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    `;
       }
 
       // Set max date to today
