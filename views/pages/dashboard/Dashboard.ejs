@@ -77,7 +77,7 @@
 
       /* Sidebar */
       .sidebar {
-        background: rgba(30, 30, 122, 0.95) !important;
+        background: rgba(68, 68, 175, 0.95) !important;
         min-height: 100vh;
         padding: 30px 15px;
         box-shadow: 4px 0 20px rgba(25, 59, 139, 0.1);
@@ -428,7 +428,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/sessions">
+              <a class="nav-link" href="/sessions/history">
                 <i class="fas fa-calendar-alt"></i> Sessions
               </a>
             </li>
@@ -485,8 +485,8 @@
           <div class="row mb-5">
             <div class="col-md-3 mb-3">
               <div class="stats-card">
-                <div class="stat-number">
-                  <%= user.stats.completedSessions %>
+                <div class="stat-number" id="completedSessions">
+                  <%= user.stats?.completedSessions || 0 %>
                 </div>
                 <div class="stat-label">Completed Sessions</div>
                 <i class="fas fa-check-circle fa-2x text-success mt-2"></i>
@@ -494,7 +494,9 @@
             </div>
             <div class="col-md-3 mb-3">
               <div class="stats-card">
-                <div class="stat-number"><%= user.stats.hoursTaught %></div>
+                <div class="stat-number" id="hoursTaught">
+                  <%= user.stats?.hoursTaught || 0 %>
+                </div>
                 <div class="stat-label">Hours Taught</div>
                 <i
                   class="fas fa-chalkboard-teacher fa-2x text-primary mt-2"
@@ -503,22 +505,54 @@
             </div>
             <div class="col-md-3 mb-3">
               <div class="stats-card">
-                <div class="stat-number"><%= user.stats.hoursLearned %></div>
+                <div class="stat-number" id="hoursLearned">
+                  <%= user.stats?.hoursLearned || 0 %>
+                </div>
                 <div class="stat-label">Hours Learned</div>
                 <i class="fas fa-graduation-cap fa-2x text-info mt-2"></i>
               </div>
             </div>
             <div class="col-md-3 mb-3">
               <div class="stats-card">
-                <% const balance = user.stats.hoursTaught -
-                user.stats.hoursLearned; %>
-                <div class="stat-number">
+                <% const hoursTaught = user.stats?.hoursTaught || 0; const
+                hoursLearned = user.stats?.hoursLearned || 0; const balance =
+                hoursTaught - hoursLearned; %>
+                <div class="stat-number" id="skillBalance">
                   <%= balance > 0 ? '+' : '' %><%= balance %>
                 </div>
                 <div class="stat-label">Skill Balance</div>
                 <i
                   class="fas fa-scale-balanced fa-2x <%= balance >= 0 ? 'text-success' : 'text-warning' %> mt-2"
+                  id="balanceIcon"
                 ></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Session Balance Card -->
+          <div class="row mb-5">
+            <div class="col-md-6">
+              <div class="card shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title">📊 Live Session Balance</h5>
+                  <div id="balanceStats">
+                    <div class="text-center">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-3">
+                    <a href="/sessions/log" class="btn btn-primary btn-sm"
+                      >+ Log Session</a
+                    >
+                    <a
+                      href="/sessions/history"
+                      class="btn btn-outline-secondary btn-sm"
+                      >View History</a
+                    >
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -776,8 +810,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // Simple animations
       document.addEventListener("DOMContentLoaded", function () {
         // Add floating animation to stats cards
         const statsCards = document.querySelectorAll(".stats-card");
@@ -785,7 +819,97 @@
           card.style.animationDelay = `${index * 0.1}s`;
           card.classList.add("floating");
         });
+
+        // Load both session stats and dashboard stats
+        loadSessionStats();
+        updateDashboardStats();
+
+        // Update stats every 30 seconds (optional)
+        setInterval(() => {
+          loadSessionStats();
+          updateDashboardStats();
+        }, 30000);
       });
+
+      // Function to load session balance stats
+      async function loadSessionStats() {
+        try {
+          const response = await fetch("/sessions/stats");
+          const data = await response.json();
+
+          const balanceClass =
+            data.balance > 0
+              ? "text-success"
+              : data.balance < 0
+              ? "text-danger"
+              : "text-secondary";
+          const balanceIcon =
+            data.balance > 0 ? "⬆️" : data.balance < 0 ? "⬇️" : "➖";
+
+          document.getElementById("balanceStats").innerHTML = `
+        <div class="row text-center">
+          <div class="col-4">
+            <h3 class="text-success">${data.hoursTaught || 0}</h3>
+            <small class="text-muted">Hours Taught</small>
+          </div>
+          <div class="col-4">
+            <h3 class="text-primary">${data.hoursLearned || 0}</h3>
+            <small class="text-muted">Hours Learned</small>
+          </div>
+          <div class="col-4">
+            <h3 class="${balanceClass}">${balanceIcon} ${data.balance || 0}</h3>
+            <small class="text-muted">Balance</small>
+          </div>
+        </div>
+        <div class="mt-3">
+          <small class="text-muted">Total Sessions: ${
+            data.totalSessions || 0
+          }</small>
+        </div>
+      `;
+        } catch (error) {
+          console.error("Error loading session stats:", error);
+          document.getElementById("balanceStats").innerHTML = `
+        <p class="text-danger">Failed to load session statistics</p>
+      `;
+        }
+      }
+
+      // Function to update dashboard stats
+      async function updateDashboardStats() {
+        try {
+          const response = await fetch("/sessions/stats");
+          const stats = await response.json();
+
+          // Update the stat numbers
+          document.getElementById("completedSessions").textContent =
+            stats.totalSessions || 0;
+          document.getElementById("hoursTaught").textContent =
+            stats.hoursTaught || 0;
+          document.getElementById("hoursLearned").textContent =
+            stats.hoursLearned || 0;
+
+          // Calculate and update balance
+          const balance = (stats.hoursTaught || 0) - (stats.hoursLearned || 0);
+          const balanceElement = document.getElementById("skillBalance");
+          const balanceIcon = document.getElementById("balanceIcon");
+
+          balanceElement.textContent = (balance > 0 ? "+" : "") + balance;
+
+          // Update balance color and icon
+          if (balance >= 0) {
+            balanceElement.className = "stat-number";
+            balanceIcon.className =
+              "fas fa-scale-balanced fa-2x text-success mt-2";
+          } else {
+            balanceElement.className = "stat-number";
+            balanceIcon.className =
+              "fas fa-scale-balanced fa-2x text-warning mt-2";
+          }
+        } catch (error) {
+          console.error("Error updating dashboard stats:", error);
+        }
+      }
     </script>
   </body>
 </html>

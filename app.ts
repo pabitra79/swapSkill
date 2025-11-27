@@ -46,6 +46,8 @@ import { Swaprouter } from "./app/router/request.router";
 app.use("/requests",Swaprouter);
 import {chatRouter} from "./app/router/chat.router";
 app.use("/chat",chatRouter)
+import { sessionRouter } from "./app/router/session.router";
+app.use('/sessions', sessionRouter);
 
 httpServer.listen(5000,()=>{
     console.log("Server port is 5000")

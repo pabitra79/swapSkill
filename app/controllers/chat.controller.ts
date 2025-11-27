@@ -39,7 +39,8 @@ export class ChatController {
             title: 'Messages - SkillSwap',
             conversations,
             activeConversation,
-            currentUser: req.user
+            currentUser: req.user,
+             user: req.user,        // Add this for navbar
         });
     } catch (error) {
         console.error('❌ Chat page error:', error);

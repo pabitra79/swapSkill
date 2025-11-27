@@ -1,26 +1,16 @@
-// import express from 'express';
-// import {
-//   showLogSessionForm,
-//   logSession,
-//   getSessionHistory,
-//   getUserBalance,
-//   getDashboardStats
-// } from '../controllers/session.controller';
-// import { requireAuth } from '../middleware/auth.middleware'; 
+import express from 'express';
+import { sessionController } from '../controllers/session.controller';
+import { requireAuth } from '../middleware/auth.middleware'; 
 
-// const Sessionrouter = express.Router();
+const sessionRouter = express.Router();
 
+sessionRouter.use(requireAuth);
 
-// Sessionrouter.use(requireAuth);
+sessionRouter.get('/log', sessionController.showLogSessionForm);
+sessionRouter.post('/log', sessionController.logSession);
+sessionRouter.get('/history', sessionController.getSessionHistory);
+sessionRouter.get('/balance', sessionController.getUserBalance);
+sessionRouter.get('/stats', sessionController.getDashboardStats);
+sessionRouter.get('/api/user/stats', sessionController.getDashboardStats);
 
-// Sessionrouter.get('/log', showLogSessionForm);
-
-// Sessionrouter.post('/log', logSession);
-
-// Sessionrouter.get('/history', getSessionHistory);
-
-// Sessionrouter.get('/balance', getUserBalance);
-
-// Sessionrouter.get('/stats', getDashboardStats);
-
-// export {Sessionrouter};
+export { sessionRouter };

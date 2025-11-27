@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> - SkillSwap</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #667eea;
+        --primary-dark: #764ba2;
+        --secondary: #f093fb;
+        --accent: #4facfe;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --dark: #1f2937;
+        --light: #f8fafc;
+        --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-secondary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      }
+
+      * {
+        font-family: "Inter", sans-serif;
+      }
+
+      body {
+        background: rgba(212, 212, 238, 0.95) !important;
+        overflow-x: hidden;
+      }
+
+      /* Navbar Styles */
+      .skillswap-navbar {
+        background: rgba(134, 170, 189, 0.95) !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        padding: 1rem 0;
+      }
+
+      .navbar-brand {
+        font-weight: 800;
+        font-size: 1.8rem;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .nav-link {
+        color: var(--dark) !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-radius: 25px;
+        padding: 0.5rem 1.2rem !important;
+        margin: 0 0.3rem;
+      }
+
+      .nav-link:hover {
+        background: var(--gradient);
+        color: white !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      /* Sidebar */
+      .sidebar {
+        background: rgba(48, 48, 178, 0.95) !important;
+        min-height: 100vh;
+        padding: 30px 15px;
+        box-shadow: 4px 0 20px rgba(25, 59, 139, 0.1);
+      }
+
+      .sidebar .nav-link {
+        color: #d1d5db !important;
+        padding: 15px 20px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .sidebar .nav-link:hover {
+        background: var(--gradient);
+        color: white !important;
+        transform: translateX(8px);
+      }
+
+      .sidebar .nav-link.active {
+        background: var(--gradient);
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .sidebar .nav-link i {
+        margin-right: 12px;
+        width: 20px;
+        text-align: center;
+      }
+
+      /* Main Content */
+      .main-content {
+        background: rgba(212, 212, 238, 0.95);
+        min-height: 100vh;
+        padding: 30px;
+      }
+
+      /* Section Titles */
+      .section-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .section-subtitle {
+        color: #6b7280;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+      }
+
+      /* Cards */
+      .card-custom {
+        background: white;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+
+      .card-custom:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-header-custom {
+        background: var(--gradient);
+        color: white;
+        border: none;
+        padding: 1.5rem 2rem;
+      }
+
+      .card-header-custom h3 {
+        margin: 0;
+        font-weight: 700;
+      }
+
+      /* Form Styles */
+      .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control,
+      .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .form-check-input:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+      }
+
+      .form-check-label {
+        font-weight: 500;
+        color: #374151;
+      }
+
+      /* Buttons */
+      .btn-primary {
+        background: var(--gradient);
+        border: none;
+        font-weight: 600;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-outline-secondary {
+        border: 2px solid #6b7280;
+        color: #6b7280;
+        font-weight: 600;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-outline-secondary:hover {
+        background: #6b7280;
+        border-color: #6b7280;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      /* Alert */
+      .alert-custom {
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+      }
+
+      /* Role Selection Cards */
+      .role-card {
+        border: 2px solid #e5e7eb;
+        border-radius: 15px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+      }
+
+      .role-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .role-card.selected {
+        border-color: var(--primary);
+        background: rgba(102, 126, 234, 0.05);
+      }
+
+      .role-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .sidebar {
+          min-height: auto;
+          padding: 20px 15px;
+        }
+
+        .section-title {
+          font-size: 1.8rem;
+        }
+
+        .card-header-custom {
+          padding: 1rem 1.5rem;
+        }
+
+        .btn-primary,
+        .btn-outline-secondary {
+          padding: 0.7rem 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('../partials/navbar') %>
+
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="/dashboard">
+                <i class="fas fa-home"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/browse">
+                <i class="fas fa-search"></i> Browse Users
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/chat">
+                <i class="fas fa-comments"></i> Messages
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/sessions">
+                <i class="fas fa-calendar-alt"></i> Sessions
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/profile">
+                <i class="fas fa-user"></i> My Profile
+              </a>
+            </li>
+            <li class="nav-item mt-5">
+              <a class="nav-link text-danger" href="/api/logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <!-- Header -->
+              <div class="mb-4">
+                <h1 class="section-title mb-2">
+                  <i class="fas fa-calendar-plus text-primary me-2"></i>
+                  Log New Session
+                </h1>
+                <p class="section-subtitle mb-0">
+                  Record your skill exchange session with a partner
+                </p>
+              </div>
+
+              <!-- Form Card -->
+              <div class="card-custom">
+                <div class="card-header-custom">
+                  <h3 class="mb-0">
+                    <i class="fas fa-pencil-alt me-2"></i>Session Details
+                  </h3>
+                </div>
+                <div class="card-body p-4">
+                  <form id="logSessionForm">
+                    <!-- Partner Selection -->
+                    <div class="mb-4">
+                      <label for="partnerId" class="form-label">
+                        <i class="fas fa-user-friends me-2"></i>Session Partner
+                      </label>
+                      <select
+                        class="form-select"
+                        id="partnerId"
+                        name="partnerId"
+                        required
+                      >
+                        <option value="">Select a partner...</option>
+                        <% partners.forEach(partner => { %>
+                        <option value="<%= partner._id %>">
+                          <%= partner.name %> (<%= partner.email %>)
+                        </option>
+                        <% }); %>
+                      </select>
+                      <% if (partners.length === 0) { %>
+                      <div class="alert alert-warning alert-custom mt-2">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        No accepted swap partners yet.
+                        <a href="/browse" class="alert-link">Find partners</a>
+                      </div>
+                      <% } %>
+                    </div>
+
+                    <!-- Role Selection -->
+                    <div class="mb-4">
+                      <label class="form-label mb-3">
+                        <i class="fas fa-user-tag me-2"></i>Your Role
+                      </label>
+
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div
+                            class="role-card"
+                            onclick="selectRole('teacher')"
+                          >
+                            <div class="role-icon text-success">
+                              <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <h5 class="mb-2">👨‍🏫 I was the Teacher</h5>
+                            <p class="text-muted mb-0">I taught them a skill</p>
+                            <input
+                              class="form-check-input d-none"
+                              type="radio"
+                              name="role"
+                              id="roleTeacher"
+                              value="teacher"
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div
+                            class="role-card"
+                            onclick="selectRole('student')"
+                          >
+                            <div class="role-icon text-primary">
+                              <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h5 class="mb-2">👨‍🎓 I was the Student</h5>
+                            <p class="text-muted mb-0">
+                              They taught me a skill
+                            </p>
+                            <input
+                              class="form-check-input d-none"
+                              type="radio"
+                              name="role"
+                              id="roleStudent"
+                              value="student"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Skill -->
+                    <div class="mb-4">
+                      <label for="skill" class="form-label">
+                        <i class="fas fa-book me-2"></i>Skill Exchanged
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="skill"
+                        name="skill"
+                        placeholder="e.g., Node.js, React, Python, UI Design"
+                        required
+                      />
+                    </div>
+
+                    <!-- Hours -->
+                    <div class="mb-4">
+                      <label for="hours" class="form-label">
+                        <i class="fas fa-clock me-2"></i>Session Duration
+                      </label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="hours"
+                        name="hours"
+                        min="0.5"
+                        step="0.5"
+                        placeholder="e.g., 2"
+                        required
+                      />
+                      <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Minimum 0.5 hours (30 minutes)
+                      </small>
+                    </div>
+
+                    <!-- Date -->
+                    <div class="mb-4">
+                      <label for="date" class="form-label">
+                        <i class="fas fa-calendar me-2"></i>Session Date
+                      </label>
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="date"
+                        name="date"
+                        max="<%= new Date().toISOString().split('T')[0] %>"
+                        required
+                      />
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="d-grid gap-3">
+                      <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-check-circle me-2"></i>Log Session
+                      </button>
+                      <a href="/dashboard" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                      </a>
+                    </div>
+
+                    <!-- Alert Container -->
+                    <div id="alertContainer" class="mt-4"></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Role selection functionality
+      function selectRole(role) {
+        // Remove selected class from all cards
+        document.querySelectorAll(".role-card").forEach((card) => {
+          card.classList.remove("selected");
+        });
+
+        // Add selected class to clicked card
+        const selectedCard = event.currentTarget;
+        selectedCard.classList.add("selected");
+
+        // Check the corresponding radio button
+        document.getElementById(
+          `role${role.charAt(0).toUpperCase() + role.slice(1)}`
+        ).checked = true;
+      }
+
+      // Form submission
+      document
+        .getElementById("logSessionForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.target);
+          const data = Object.fromEntries(formData);
+
+          try {
+            const response = await fetch("/sessions/log", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              // Success
+              showAlert(
+                "success",
+                "✅ Session logged successfully! Redirecting to rating..."
+              );
+              setTimeout(() => {
+                window.location.href = `/ratings/rate?sessionId=${result.sessionId}`;
+              }, 1500);
+            } else {
+              // Error
+              showAlert("danger", result.error || "Failed to log session");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            showAlert("danger", "An error occurred. Please try again.");
+          }
+        });
+
+      function showAlert(type, message) {
+        const alertContainer = document.getElementById("alertContainer");
+        alertContainer.innerHTML = `
+        <div class="alert alert-${type} alert-custom alert-dismissible fade show" role="alert">
+          <i class="fas fa-${
+            type === "success" ? "check-circle" : "exclamation-triangle"
+          } me-2"></i>
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `;
+      }
+
+      // Set max date to today
+      document.getElementById("date").value = new Date()
+        .toISOString()
+        .split("T")[0];
+    </script>
+  </body>
+</html>

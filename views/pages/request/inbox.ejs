@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
+    <title><%= title %> - SkillSwap</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -18,21 +18,72 @@
     />
     <style>
       :root {
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        --primary: #667eea;
+        --primary-dark: #764ba2;
+        --secondary: #f093fb;
+        --accent: #4facfe;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --dark: #1f2937;
+        --light: #f8fafc;
+        --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-secondary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       }
+
       * {
         font-family: "Inter", sans-serif;
       }
+
       body {
-        background: #f8f9fa;
+        background: rgba(212, 212, 238, 0.95) !important;
+        overflow-x: hidden;
       }
 
+      /* Navbar Styles */
+      .skillswap-navbar {
+        background: rgba(134, 170, 189, 0.95) !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        padding: 1rem 0;
+      }
+
+      .navbar-brand {
+        font-weight: 800;
+        font-size: 1.8rem;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .nav-link {
+        color: var(--dark) !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-radius: 25px;
+        padding: 0.5rem 1.2rem !important;
+        margin: 0 0.3rem;
+      }
+
+      .nav-link:hover {
+        background: var(--gradient);
+        color: white !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      /* Sidebar */
       .sidebar {
-        background: rgba(30, 30, 122, 0.95);
+        background: rgba(57, 57, 161, 0.95) !important;
         min-height: 100vh;
         padding: 30px 15px;
+        box-shadow: 4px 0 20px rgba(25, 59, 139, 0.1);
       }
+
       .sidebar .nav-link {
         color: #d1d5db !important;
         padding: 15px 20px;
@@ -41,118 +92,316 @@
         transition: all 0.3s ease;
         font-weight: 500;
       }
-      .sidebar .nav-link:hover,
-      .sidebar .nav-link.active {
-        background: var(--primary-gradient);
+
+      .sidebar .nav-link:hover {
+        background: var(--gradient);
         color: white !important;
         transform: translateX(8px);
       }
 
-      .request-card {
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
-        border-left: 5px solid transparent;
-      }
-      .request-card.pending {
-        border-left-color: #f59e0b;
-      }
-      .request-card.accepted {
-        border-left-color: #10b981;
-      }
-      .request-card.declined {
-        border-left-color: #ef4444;
-      }
-      .request-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      .sidebar .nav-link.active {
+        background: var(--gradient);
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
       }
 
+      .sidebar .nav-link i {
+        margin-right: 12px;
+        width: 20px;
+        text-align: center;
+      }
+
+      /* Main Content */
+      .main-content {
+        background: rgba(212, 212, 238, 0.95);
+        min-height: 100vh;
+        padding: 30px;
+      }
+
+      /* Section Titles */
+      .section-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .section-subtitle {
+        color: #6b7280;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+      }
+
+      /* Cards */
+      .card-custom {
+        background: white;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+
+      .card-custom:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Request Cards */
+      .request-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid transparent;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .request-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient);
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+
+      .request-card:hover::before {
+        opacity: 1;
+      }
+
+      .request-card.pending {
+        border-left-color: var(--warning);
+      }
+
+      .request-card.accepted {
+        border-left-color: var(--success);
+      }
+
+      .request-card.declined {
+        border-left-color: var(--danger);
+      }
+
+      .request-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      /* User Avatar */
       .user-avatar {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid #667eea;
+        border: 3px solid var(--primary);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       }
+
       .user-avatar-placeholder {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
-        background: var(--primary-gradient);
+        background: var(--gradient);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         font-weight: bold;
         border: 3px solid white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       }
 
+      /* Skill Badges */
       .skill-badge {
-        padding: 6px 15px;
+        padding: 8px 16px;
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 600;
         display: inline-block;
         margin: 5px;
-      }
-      .skill-teach {
-        background: #d4edda;
-        color: #155724;
-      }
-      .skill-learn {
-        background: #cce5ff;
-        color: #004085;
+        transition: all 0.3s ease;
       }
 
+      .skill-badge:hover {
+        transform: scale(1.05);
+      }
+
+      .skill-teach {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .skill-learn {
+        background: linear-gradient(135deg, #cce5ff, #b8daff);
+        color: #004085;
+        border: 1px solid #b8daff;
+      }
+
+      /* Status Badges */
       .status-badge {
         padding: 8px 16px;
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 700;
         text-transform: uppercase;
-      }
-      .status-pending {
-        background: #fef3c7;
-        color: #92400e;
-      }
-      .status-accepted {
-        background: #d1fae5;
-        color: #065f46;
-      }
-      .status-declined {
-        background: #fee2e2;
-        color: #991b1b;
+        letter-spacing: 0.5px;
       }
 
+      .status-pending {
+        background: var(--gradient-warning);
+        color: white;
+      }
+
+      .status-accepted {
+        background: var(--gradient-success);
+        color: white;
+      }
+
+      .status-declined {
+        background: var(--gradient-danger);
+        color: white;
+      }
+
+      /* Filter Tabs */
       .filter-tabs {
         background: white;
-        border-radius: 15px;
-        padding: 15px;
-        margin-bottom: 25px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      }
-      .filter-tabs .btn {
-        margin-right: 10px;
         border-radius: 20px;
-        font-weight: 600;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       }
 
+      .filter-tabs .btn {
+        margin-right: 10px;
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 0.7rem 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .filter-tabs .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      /* Buttons */
+      .btn-primary {
+        background: var(--gradient);
+        border: none;
+        font-weight: 600;
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-success {
+        background: var(--gradient-success);
+        border: none;
+        font-weight: 600;
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+      }
+
+      .btn-danger {
+        background: var(--gradient-danger);
+        border: none;
+        font-weight: 600;
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+      }
+
+      .btn-outline-primary {
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        font-weight: 600;
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-outline-primary:hover {
+        background: var(--gradient);
+        border-color: transparent;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      /* Message Box */
+      .message-box {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 15px;
+        padding: 1.5rem;
+        border-left: 4px solid var(--primary);
+      }
+
+      /* Empty State */
       .empty-state {
         text-align: center;
-        padding: 60px 20px;
+        padding: 80px 20px;
         background: white;
         border-radius: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       }
+
       .empty-state i {
-        font-size: 4rem;
-        color: #d1d5db;
-        margin-bottom: 20px;
+        font-size: 5rem;
+        margin-bottom: 2rem;
+        opacity: 0.3;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .sidebar {
+          min-height: auto;
+          padding: 20px 15px;
+        }
+
+        .section-title {
+          font-size: 1.8rem;
+        }
+
+        .user-avatar,
+        .user-avatar-placeholder {
+          width: 60px;
+          height: 60px;
+          font-size: 1.5rem;
+        }
+
+        .filter-tabs .btn {
+          margin-bottom: 10px;
+          width: 100%;
+        }
       }
     </style>
   </head>
@@ -183,6 +432,16 @@
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="/chat">
+                <i class="fas fa-comments"></i> Messages
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/sessions/history">
+                <i class="fas fa-calendar-alt"></i> Sessions
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="/profile">
                 <i class="fas fa-user"></i> My Profile
               </a>
@@ -196,22 +455,20 @@
         </div>
 
         <!-- Main Content -->
-        <div class="col-md-10 p-4">
+        <div class="col-md-10 main-content">
+          <!-- Header Section -->
           <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-              <h2
-                style="
-                  background: var(--primary-gradient);
-                  -webkit-text-fill-color: transparent;
-                  font-weight: 800;
-                "
-              >
-                <i class="fas fa-inbox"></i> Received Requests
-              </h2>
-              <p class="text-muted">Manage your incoming swap requests</p>
+              <h1 class="section-title mb-2">
+                <i class="fas fa-inbox text-primary me-2"></i>
+                Received Requests
+              </h1>
+              <p class="section-subtitle mb-0">
+                Manage your incoming swap requests and connect with partners
+              </p>
             </div>
             <a href="/requests/outbox" class="btn btn-outline-primary">
-              <i class="fas fa-paper-plane me-2"></i> Sent Requests
+              <i class="fas fa-paper-plane me-2"></i> View Sent Requests
             </a>
           </div>
 
@@ -219,30 +476,30 @@
           <div class="filter-tabs">
             <a
               href="/requests/inbox?status=all"
-              class="btn <%= currentStatus === 'all' ? 'btn-primary' : 'btn-outline-secondary' %>"
+              class="btn <%= currentStatus === 'all' ? 'btn-primary' : 'btn-outline-primary' %>"
             >
-              All Requests
+              <i class="fas fa-list me-2"></i>All Requests
             </a>
             <a
               href="/requests/inbox?status=pending"
               class="btn <%= currentStatus === 'pending' ? 'btn-warning' : 'btn-outline-warning' %>"
             >
-              Pending <% if (pendingCount > 0) { %><span
-                class="badge bg-danger ms-1"
-                ><%= pendingCount %></span
-              ><% } %>
+              <i class="fas fa-clock me-2"></i>Pending <% if (pendingCount > 0)
+              { %>
+              <span class="badge bg-danger ms-1"><%= pendingCount %></span>
+              <% } %>
             </a>
             <a
               href="/requests/inbox?status=accepted"
               class="btn <%= currentStatus === 'accepted' ? 'btn-success' : 'btn-outline-success' %>"
             >
-              Accepted
+              <i class="fas fa-check-circle me-2"></i>Accepted
             </a>
             <a
               href="/requests/inbox?status=declined"
               class="btn <%= currentStatus === 'declined' ? 'btn-danger' : 'btn-outline-danger' %>"
             >
-              Declined
+              <i class="fas fa-times-circle me-2"></i>Declined
             </a>
           </div>
 
@@ -251,6 +508,7 @@
           requests.forEach(request => { %>
           <div class="request-card <%= request.status %>">
             <div class="row align-items-center">
+              <!-- User Info -->
               <div class="col-md-2 text-center">
                 <% if (request.fromUser.profile &&
                 request.fromUser.profile.avatar) { %>
@@ -264,57 +522,67 @@
                   <%= request.fromUser.name.charAt(0).toUpperCase() %>
                 </div>
                 <% } %>
-                <h6 class="mt-2 mb-0"><%= request.fromUser.name %></h6>
+                <h6 class="mt-3 mb-1 fw-bold"><%= request.fromUser.name %></h6>
                 <% if (request.fromUser.profile &&
                 request.fromUser.profile.location) { %>
                 <small class="text-muted">
-                  <i class="fas fa-map-marker-alt"></i> <%=
-                  request.fromUser.profile.location %>
+                  <i class="fas fa-map-marker-alt me-1"></i>
+                  <%= request.fromUser.profile.location %>
                 </small>
                 <% } %>
               </div>
 
+              <!-- Request Details -->
               <div class="col-md-7">
                 <div class="mb-3">
-                  <span class="status-badge status-<%= request.status %>">
-                    <%= request.status %>
+                  <span class="status-badge status-<%= request.status %> me-3">
+                    <i
+                      class="fas fa-<%= request.status === 'pending' ? 'clock' : request.status === 'accepted' ? 'check' : 'times' %> me-1"
+                    ></i>
+                    <%= request.status.charAt(0).toUpperCase() +
+                    request.status.slice(1) %>
                   </span>
-                  <small class="text-muted ms-2">
-                    <i class="far fa-clock"></i> <%= new
-                    Date(request.createdAt).toLocaleDateString() %>
+                  <small class="text-muted">
+                    <i class="far fa-clock me-1"></i>
+                    <%= new Date(request.createdAt).toLocaleDateString() %>
                   </small>
                 </div>
 
-                <div class="mb-3">
-                  <div class="mb-2">
-                    <strong class="text-success">
-                      <i class="fas fa-chalkboard-teacher"></i> They'll teach
-                      you:
+                <!-- Skills Exchange -->
+                <div class="mb-4">
+                  <div class="mb-3">
+                    <strong class="text-success d-block mb-2">
+                      <i class="fas fa-chalkboard-teacher me-2"></i>They'll
+                      teach you:
                     </strong>
-                    <span class="skill-badge skill-teach"
-                      ><%= request.skillToTeach %></span
-                    >
+                    <span class="skill-badge skill-teach">
+                      <i class="fas fa-arrow-right me-1"></i><%=
+                      request.skillToTeach %>
+                    </span>
                   </div>
                   <div>
-                    <strong class="text-primary">
-                      <i class="fas fa-book-reader"></i> They want to learn:
+                    <strong class="text-primary d-block mb-2">
+                      <i class="fas fa-book-reader me-2"></i>They want to learn:
                     </strong>
-                    <span class="skill-badge skill-learn"
-                      ><%= request.skillToLearn %></span
-                    >
+                    <span class="skill-badge skill-learn">
+                      <i class="fas fa-arrow-left me-1"></i><%=
+                      request.skillToLearn %>
+                    </span>
                   </div>
                 </div>
 
-                <div class="bg-light p-3 rounded">
-                  <strong class="d-block mb-2">
-                    <i class="fas fa-comment-dots"></i> Message:
+                <!-- Message -->
+                <div class="message-box">
+                  <strong class="d-block mb-2 text-primary">
+                    <i class="fas fa-comment-dots me-2"></i>Message:
                   </strong>
-                  <p class="mb-0 text-muted">
-                    <em>"<%= request.message %>"</em>
+                  <p class="mb-0 fst-italic text-dark">
+                    "<%= request.message %>"
                   </p>
                 </div>
               </div>
 
+              <!-- Actions -->
               <div class="col-md-3">
                 <% if (request.status === 'pending') { %>
                 <div class="d-grid gap-2">
@@ -322,19 +590,19 @@
                     class="btn btn-success"
                     onclick="acceptRequest('<%= request._id %>')"
                   >
-                    <i class="fas fa-check"></i> Accept
+                    <i class="fas fa-check me-2"></i>Accept
                   </button>
                   <button
                     class="btn btn-danger"
                     onclick="declineRequest('<%= request._id %>')"
                   >
-                    <i class="fas fa-times"></i> Decline
+                    <i class="fas fa-times me-2"></i>Decline
                   </button>
                   <a
                     href="/profile/view/<%= request.fromUser._id %>"
                     class="btn btn-outline-primary"
                   >
-                    <i class="fas fa-eye"></i> View Profile
+                    <i class="fas fa-eye me-2"></i>View Profile
                   </a>
                 </div>
                 <% } else if (request.status === 'accepted') { %>
@@ -343,33 +611,40 @@
                     href="/chat?conversation=<%= request._id %>"
                     class="btn btn-primary"
                   >
-                    <i class="fas fa-comments"></i> Start Chat
+                    <i class="fas fa-comments me-2"></i>Start Chat
+                  </a>
+                  <a
+                    href="/sessions/log?partnerId=<%= request.fromUser._id %>"
+                    class="btn btn-outline-success"
+                  >
+                    <i class="fas fa-calendar-plus me-2"></i>Log Session
                   </a>
                   <a
                     href="/profile/view/<%= request.fromUser._id %>"
                     class="btn btn-outline-primary"
                   >
-                    <i class="fas fa-eye"></i> View Profile
+                    <i class="fas fa-eye me-2"></i>View Profile
                   </a>
                 </div>
                 <% } else { %>
                 <div class="text-center text-muted">
-                  <i class="fas fa-info-circle fa-2x mb-2"></i>
-                  <p class="mb-0">Request <%= request.status %></p>
-                  <small
-                    ><%= new Date(request.respondedAt ||
-                    request.updatedAt).toLocaleDateString() %></small
-                  >
+                  <i class="fas fa-info-circle fa-2x mb-3 text-danger"></i>
+                  <p class="mb-1 fw-bold">Request <%= request.status %></p>
+                  <small class="text-muted">
+                    <%= new Date(request.respondedAt ||
+                    request.updatedAt).toLocaleDateString() %>
+                  </small>
                 </div>
                 <% } %>
               </div>
             </div>
           </div>
           <% }); %> <% } else { %>
+          <!-- Empty State -->
           <div class="empty-state">
             <i class="fas fa-inbox"></i>
-            <h4>No Requests Found</h4>
-            <p class="text-muted">
+            <h3 class="mb-3">No Requests Found</h3>
+            <p class="text-muted mb-4">
               <% if (currentStatus === 'pending') { %> You don't have any
               pending requests right now. <% } else if (currentStatus ===
               'accepted') { %> You haven't accepted any requests yet. <% } else
@@ -377,8 +652,8 @@
               requests. <% } else { %> You haven't received any swap requests
               yet. <% } %>
             </p>
-            <a href="/browse" class="btn btn-primary mt-3">
-              <i class="fas fa-search"></i> Browse Users
+            <a href="/browse" class="btn btn-primary">
+              <i class="fas fa-search me-2"></i>Browse Users
             </a>
           </div>
           <% } %>
@@ -404,13 +679,13 @@
 
           const data = await response.json();
           if (data.success) {
-            alert("✅ " + data.message);
-            location.reload();
+            showAlert("success", "✅ " + data.message);
+            setTimeout(() => location.reload(), 1500);
           } else {
-            alert("❌ " + data.message);
+            showAlert("danger", "❌ " + data.message);
           }
         } catch (error) {
-          alert("❌ Failed to accept request");
+          showAlert("danger", "❌ Failed to accept request");
         }
       }
 
@@ -428,14 +703,35 @@
 
           const data = await response.json();
           if (data.success) {
-            alert("Request declined");
-            location.reload();
+            showAlert("warning", "Request declined");
+            setTimeout(() => location.reload(), 1500);
           } else {
-            alert("❌ " + data.message);
+            showAlert("danger", "❌ " + data.message);
           }
         } catch (error) {
-          alert("❌ Failed to decline request");
+          showAlert("danger", "❌ Failed to decline request");
         }
+      }
+
+      function showAlert(type, message) {
+        // Create alert element
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText =
+          "top: 20px; right: 20px; z-index: 9999; min-width: 300px;";
+        alertDiv.innerHTML = `
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        document.body.appendChild(alertDiv);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+          if (alertDiv.parentNode) {
+            alertDiv.remove();
+          }
+        }, 5000);
       }
     </script>
   </body>

@@ -42,7 +42,9 @@ export class RequestController {
                 title: 'Received Requests - SkillSwap',
                 requests,
                 pendingCount,
-                currentStatus: status
+                currentStatus: status,
+                user: req.user,  // Add this for navbar
+            currentUser: req.user // Add this for consistency
             });
         } catch (error) {
             console.error('Get inbox error:', error);
@@ -130,7 +132,9 @@ export class RequestController {
                 title: 'Sent Requests - SkillSwap',
                 requests,
                 pendingCount,
-                currentStatus: status
+                currentStatus: status,
+                user: req.user,  // Add this for navbar
+            currentUser: req.user // Add this for consistency
             });
         } catch (error) {
             console.error(' Get outbox error:', error);
