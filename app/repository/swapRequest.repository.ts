@@ -138,6 +138,25 @@ export class SwapRequestRepository {
         const result = await SwapRequest.findByIdAndDelete(requestId);
         return !!result;
     }
+    async getAcceptedSwaps(userId: string) {
+  return await SwapRequest.find({
+    $or: [
+      { fromUser: userId, status: 'accepted' },
+      { toUser: userId, status: 'accepted' }
+    ]
+  }).populate('fromUser toUser', 'name email');
+}
+
+    async checkSwapExists(userId: string, partnerId: string): Promise<boolean> {
+  const swap = await SwapRequest.findOne({
+    $or: [
+      { fromUser: userId, toUser: partnerId, status: 'accepted' },
+      { fromUser: partnerId, toUser: userId, status: 'accepted' }
+    ]
+  });
+  
+  return swap !== null;
+}
 }
 
 export const swapRequestRepository = new SwapRequestRepository();

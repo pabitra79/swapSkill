@@ -26,4 +26,5 @@ export interface IChatConversation {
     };
     unreadCount: number;
     skill: string;
+    swapRequestCount?: number;//add new
 }

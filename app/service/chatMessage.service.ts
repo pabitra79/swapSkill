@@ -19,15 +19,6 @@ export class ChatMessageService {
                 return { success: false, error: 'Swap request not found' };
             }
 
-            console.log('✅ Swap request found:', swapRequest._id);
-            console.log('📋 Swap request details:', {
-                status: swapRequest.status,
-                fromUser: swapRequest.fromUser,
-                toUser: swapRequest.toUser,
-                fromUserType: typeof swapRequest.fromUser,
-                toUserType: typeof swapRequest.toUser
-            });
-
             // Handle both populated and non-populated user objects
             const fromUserIdStr = swapRequest.fromUser._id 
                 ? swapRequest.fromUser._id.toString() 
@@ -38,14 +29,6 @@ export class ChatMessageService {
             
             const currentUserId = data.fromUserId.toString();
             
-            console.log('🔍 Comparing IDs:', {
-                fromUserIdStr,
-                toUserIdStr,
-                currentUserId,
-                isFromUser: fromUserIdStr === currentUserId,
-                isToUser: toUserIdStr === currentUserId
-            });
-
             const isFromUser = fromUserIdStr === currentUserId;
             const isToUser = toUserIdStr === currentUserId;
             
@@ -53,8 +36,6 @@ export class ChatMessageService {
                 console.log('❌ User not part of conversation');
                 return { success: false, error: 'You are not part of this conversation' };
             }
-            
-            console.log('✅ User authorized');
             
             if (swapRequest.status !== 'accepted') {
                 console.log('❌ Request not accepted, status:', swapRequest.status);
@@ -109,13 +90,6 @@ export class ChatMessageService {
             
             const currentUserId = userId.toString();
             
-            console.log('🔍 Checking access:', {
-                fromUserIdStr,
-                toUserIdStr,
-                currentUserId,
-                isAuthorized: fromUserIdStr === currentUserId || toUserIdStr === currentUserId
-            });
-            
             const isAuthorized = fromUserIdStr === currentUserId || toUserIdStr === currentUserId;
             
             if (!isAuthorized) {
@@ -128,16 +102,72 @@ export class ChatMessageService {
                 return { success: false, error: 'Chat is only available for accepted swap requests' };
             }
 
-            const messages = await chatMessageRepository.getMessagesBySwapRequest(swapRequestId);
-            await chatMessageRepository.markAsRead(swapRequestId, userId);
+            // Get the other user ID
+            const otherUserId = fromUserIdStr === currentUserId ? toUserIdStr : fromUserIdStr;
+            
+            // Get ALL messages between these two users (across all swap requests)
+            const allMessages = await this.getAllMessagesBetweenUsers(currentUserId, otherUserId);
+            
+            // Mark all as read
+            await this.markAllAsReadBetweenUsers(currentUserId, otherUserId);
 
-            console.log('✅ Loaded', messages.length, 'messages');
-            return { success: true, messages };
+            console.log('✅ Loaded', allMessages.length, 'messages from all swap requests');
+            return { success: true, messages: allMessages };
         } catch (error: any) {
             console.error('❌ getChatHistory error:', error);
             return { success: false, error: error.message || 'Failed to load messages' };
         }
     }
+
+    // NEW: Get all messages between two users (across all swap requests)
+    private async getAllMessagesBetweenUsers(userId1: string, userId2: string): Promise<IChatMessage[]> {
+        // Get all swap request IDs between these users
+        const swapRequestIds = await this.getSwapRequestIdsBetweenUsers(userId1, userId2);
+        
+        // Get messages from ALL swap requests
+        const allMessages: IChatMessage[] = [];
+        for (const swapRequestId of swapRequestIds) {
+            const messages = await chatMessageRepository.getMessagesBySwapRequest(swapRequestId);
+            allMessages.push(...messages);
+        }
+        
+        // Sort by creation time
+        return allMessages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    }
+
+    // NEW: Mark all messages as read between two users
+    private async markAllAsReadBetweenUsers(userId1: string, userId2: string): Promise<void> {
+        const swapRequestIds = await this.getSwapRequestIdsBetweenUsers(userId1, userId2);
+        for (const swapRequestId of swapRequestIds) {
+            await chatMessageRepository.markAsRead(swapRequestId, userId1);
+        }
+    }
+
+    // NEW: Get all swap request IDs between two users
+    async getSwapRequestIdsBetweenUsers(userId1: string, userId2: string): Promise<string[]> {
+    const acceptedInbox = await swapRequestRepository.getInbox(userId1, 'accepted');
+    const acceptedOutbox = await swapRequestRepository.getOutbox(userId1, 'accepted');
+    const allAccepted = [...acceptedInbox, ...acceptedOutbox];
+    
+    const swapRequestIds: string[] = [];
+    
+    allAccepted.forEach(request => {
+        const fromUserIdStr = request.fromUser._id 
+            ? request.fromUser._id.toString() 
+            : request.fromUser.toString();
+        const toUserIdStr = request.toUser._id 
+            ? request.toUser._id.toString() 
+            : request.toUser.toString();
+        
+        // Check if this request is between userId1 and userId2
+        if ((fromUserIdStr === userId1 && toUserIdStr === userId2) ||
+            (fromUserIdStr === userId2 && toUserIdStr === userId1)) {
+            swapRequestIds.push(request._id.toString());
+        }
+    });
+    
+    return swapRequestIds;
+}
 
     async getConversations(userId: string): Promise<IChatConversation[]> {
         try {
@@ -146,56 +176,97 @@ export class ChatMessageService {
             const acceptedInbox = await swapRequestRepository.getInbox(userId, 'accepted');
             const acceptedOutbox = await swapRequestRepository.getOutbox(userId, 'accepted');
             
-            // Combine and remove duplicates by swapRequestId
             const allAccepted = [...acceptedInbox, ...acceptedOutbox];
-            const uniqueAccepted = allAccepted.filter((request, index, self) => 
-                index === self.findIndex(r => r._id.toString() === request._id.toString())
-            );
             
             console.log('✅ Accepted requests found:', {
                 inbox: acceptedInbox.length,
                 outbox: acceptedOutbox.length,
-                total: allAccepted.length,
-                unique: uniqueAccepted.length
+                total: allAccepted.length
             });
 
+            // 🔥 CRITICAL FIX: Group by OTHER USER instead of by swap request
+            const conversationMap = new Map<string, {
+                swapRequests: any[];
+                otherUserId: string;
+                otherUserName: string;
+                otherUserEmail: string;
+                otherUserAvatar?: string;
+                skills: string[];
+            }>();
+
+            allAccepted.forEach(request => {
+                const fromUserIdStr = request.fromUser._id 
+                    ? request.fromUser._id.toString() 
+                    : request.fromUser.toString();
+                const toUserIdStr = request.toUser._id 
+                    ? request.toUser._id.toString() 
+                    : request.toUser.toString();
+                
+                const isFromUser = fromUserIdStr === userId;
+                const otherUser = isFromUser ? request.toUser : request.fromUser;
+                const otherUserId = isFromUser ? toUserIdStr : fromUserIdStr;
+                
+                if (!conversationMap.has(otherUserId)) {
+                    conversationMap.set(otherUserId, {
+                        swapRequests: [],
+                        otherUserId,
+                        otherUserName: (otherUser as any).name,
+                        otherUserEmail: (otherUser as any).email,
+                        otherUserAvatar: (otherUser as any).profile?.avatar,
+                        skills: []
+                    });
+                }
+                
+                const conv = conversationMap.get(otherUserId)!;
+                conv.swapRequests.push(request);
+                // Add both skills to show all skills exchanged
+                conv.skills.push(request.skillToTeach, request.skillToLearn);
+            });
+
+            console.log('✅ Unique conversations (by person):', conversationMap.size);
+
             const conversations = await Promise.all(
-                uniqueAccepted.map(async (request) => {
-                    // Determine the other user - handle both populated and non-populated
-                    const fromUserIdStr = request.fromUser._id 
-                        ? request.fromUser._id.toString() 
-                        : request.fromUser.toString();
-                    const toUserIdStr = request.toUser._id 
-                        ? request.toUser._id.toString() 
-                        : request.toUser.toString();
+                Array.from(conversationMap.values()).map(async (conv) => {
+                    // Use the FIRST swap request ID as the primary conversation ID
+                    const primarySwapRequest = conv.swapRequests[0];
+                    const swapRequestId = primarySwapRequest._id.toString();
                     
-                    const isFromUser = fromUserIdStr === userId;
-                    const otherUser = isFromUser ? request.toUser : request.fromUser;
+                    // Get ALL messages between these users (across all swap requests)
+                    const allMessages = await this.getAllMessagesBetweenUsers(userId, conv.otherUserId);
                     
-                    const messages = await chatMessageRepository.getMessagesBySwapRequest(request._id.toString());
-                    const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-                    const unreadCount = await chatMessageRepository.getUnreadCountBySwapRequest(request._id.toString(), userId);
+                    const lastMessage = allMessages.length > 0 ? allMessages[allMessages.length - 1] : null;
+                    
+                    // Calculate total unread count across all swap requests
+                    let totalUnreadCount = 0;
+                    for (const request of conv.swapRequests) {
+                        const count = await chatMessageRepository.getUnreadCountBySwapRequest(request._id.toString(), userId);
+                        totalUnreadCount += count;
+                    }
+                    
+                    // Create unique skills list
+                    const uniqueSkills = [...new Set(conv.skills)].join(', ');
 
                     return {
-                        swapRequestId: request._id.toString(),
+                        swapRequestId, // Use first swap request ID as the conversation identifier
                         otherUser: {
-                            _id: (otherUser as any)._id?.toString() || otherUser.toString(),
-                            name: (otherUser as any).name,
-                            email: (otherUser as any).email,
-                            avatar: (otherUser as any).profile?.avatar
+                            _id: conv.otherUserId,
+                            name: conv.otherUserName,
+                            email: conv.otherUserEmail,
+                            avatar: conv.otherUserAvatar
                         },
                         lastMessage: lastMessage ? {
                             text: lastMessage.message,
                             fromMe: lastMessage.fromUser.toString() === userId,
                             timestamp: lastMessage.createdAt
                         } : undefined,
-                        unreadCount,
-                        skill: request.skillToTeach
+                        unreadCount: totalUnreadCount,
+                        skill: uniqueSkills,
+                        swapRequestCount: conv.swapRequests.length // Show how many swaps with this person
                     };
                 })
             );
 
-            console.log('✅ Final unique conversations:', conversations.length);
+            console.log('✅ Final conversations (grouped by person):', conversations.length);
             
             return conversations.sort((a, b) => {
                 const timeA = a.lastMessage?.timestamp || new Date(0);
@@ -233,7 +304,21 @@ export class ChatMessageService {
 
     async markConversationAsRead(swapRequestId: string, userId: string): Promise<void> {
         try {
-            await chatMessageRepository.markAsRead(swapRequestId, userId);
+            // Get the other user from this swap request
+            const swapRequest = await swapRequestRepository.findById(swapRequestId);
+            if (!swapRequest) return;
+            
+            const fromUserIdStr = swapRequest.fromUser._id 
+                ? swapRequest.fromUser._id.toString() 
+                : swapRequest.fromUser.toString();
+            const toUserIdStr = swapRequest.toUser._id 
+                ? swapRequest.toUser._id.toString() 
+                : swapRequest.toUser.toString();
+            
+            const otherUserId = fromUserIdStr === userId ? toUserIdStr : fromUserIdStr;
+            
+            // Mark ALL messages between these users as read
+            await this.markAllAsReadBetweenUsers(userId, otherUserId);
         } catch (error) {
             console.error('❌ Mark as read error:', error);
         }

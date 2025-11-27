@@ -2,68 +2,79 @@
 import { Server as SocketIOServer } from 'socket.io';
 import { Server as HTTPServer } from 'http';
 import { chatMessageService } from '../service/chatMessage.service';
-
-// Store online users: userId -> socketId
-const onlineUsers = new Map<string, string>();
+import { swapRequestRepository } from '../repository/swapRequest.repository';
 
 export function initializeSocket(httpServer: HTTPServer) {
     const io = new SocketIOServer(httpServer, {
         cors: {
-            origin: '*', // Allow all origins for development
+            origin: '*',
             methods: ['GET', 'POST'],
             credentials: true
         },
-        transports: ['websocket', 'polling'], // Support both WebSocket and polling
-        allowEIO3: true
+        transports: ['websocket', 'polling']
     });
 
     io.on('connection', (socket) => {
         console.log('🔌 Socket connected:', socket.id);
 
-        // User authenticates and connects
         socket.on('authenticate', (data: { userId: string }) => {
-            const userId = data.userId;
-            console.log('👤 User authenticated:', userId, 'Socket:', socket.id);
-            onlineUsers.set(userId, socket.id);
-            
-            // Notify all clients about online user
-            io.emit('user_online', userId);
+            console.log('👤 User authenticated:', data.userId, 'Socket:', socket.id);
         });
 
-        // User joins a chat room
         socket.on('join_chat', (swapRequestId: string) => {
-            socket.join(`chat_${swapRequestId}`);
-            console.log(`📥 Socket ${socket.id} joined room: chat_${swapRequestId}`);
+            const roomName = `chat_${swapRequestId}`;
+            socket.join(roomName);
+            console.log(`📥 Socket ${socket.id} joined room: ${roomName}`);
         });
 
-        // User sends a message
         socket.on('send_message', async (data: {
             swapRequestId: string;
             fromUserId: string;
             message: string;
         }) => {
-            console.log('📤 send_message event received:', data);
-
+            console.log('📤 send_message received:', data);
+            
             try {
                 const result = await chatMessageService.sendMessage(data);
 
                 if (result.success && result.message) {
-                    console.log('✅ Message saved, broadcasting to room: chat_' + data.swapRequestId);
+                    console.log('✅ Message saved, broadcasting...');
                     
-                    // Broadcast to EVERYONE in the room (including sender)
-                    io.to(`chat_${data.swapRequestId}`).emit('new_message', {
-                        _id: result.message._id,
-                        swapRequestId: data.swapRequestId,
-                        fromUser: result.message.fromUser,
-                        message: result.message.message,
-                        createdAt: result.message.createdAt,
-                        isRead: false
-                    });
+                    // Get the swap request to find the other user
+                    const swapRequest = await swapRequestRepository.findById(data.swapRequestId);
+                    if (swapRequest) {
+                        const fromUserIdStr = swapRequest.fromUser._id 
+                            ? swapRequest.fromUser._id.toString() 
+                            : swapRequest.fromUser.toString();
+                        const toUserIdStr = swapRequest.toUser._id 
+                            ? swapRequest.toUser._id.toString() 
+                            : swapRequest.toUser.toString();
+                        
+                        const otherUserId = fromUserIdStr === data.fromUserId ? toUserIdStr : fromUserIdStr;
+                        
+                        // Get ALL swap request IDs between these users using the service method
+                        const allSwapRequestIds = await chatMessageService.getSwapRequestIdsBetweenUsers(data.fromUserId, otherUserId);
+                        
+                        console.log(`📦 Broadcasting to ${allSwapRequestIds.length} swap requests between users`);
+                        
+                        // Broadcast to ALL rooms (all swap requests between these users)
+                        allSwapRequestIds.forEach(swapId => {
+                            const room = `chat_${swapId}`;
+                            io.to(room).emit('new_message', {
+                                _id: result.message!._id,
+                                swapRequestId: swapId,
+                                fromUser: result.message!.fromUser,
+                                message: result.message!.message,
+                                createdAt: result.message!.createdAt,
+                                isRead: false
+                            });
+                            console.log(`📢 Broadcast to room: ${room}`);
+                        });
+                    }
                     
-                    console.log('✅ Message broadcast complete');
                 } else {
                     console.error('❌ Failed to save message:', result.error);
-                    socket.emit('message_error', { error: result.error });
+                    socket.emit('message_error', { error: result.error || 'Unknown error' });
                 }
             } catch (error) {
                 console.error('❌ send_message error:', error);
@@ -71,45 +82,11 @@ export function initializeSocket(httpServer: HTTPServer) {
             }
         });
 
-        // User is typing
-        socket.on('typing', (data: { swapRequestId: string; userId: string; userName: string }) => {
-            socket.to(`chat_${data.swapRequestId}`).emit('user_typing', {
-                userId: data.userId,
-                userName: data.userName
-            });
-        });
-
-        // User stopped typing
-        socket.on('stop_typing', (data: { swapRequestId: string; userId: string }) => {
-            socket.to(`chat_${data.swapRequestId}`).emit('user_stopped_typing', {
-                userId: data.userId
-            });
-        });
-
-        // User disconnects
         socket.on('disconnect', () => {
             console.log('🔌 Socket disconnected:', socket.id);
-            
-            // Remove from online users
-            for (const [userId, socketId] of onlineUsers.entries()) {
-                if (socketId === socket.id) {
-                    onlineUsers.delete(userId);
-                    io.emit('user_offline', userId);
-                    console.log('👤 User went offline:', userId);
-                    break;
-                }
-            }
         });
     });
 
-    console.log('✅ Socket.io initialized with CORS enabled');
+    console.log('✅ Socket.io initialized');
     return io;
-}
-
-export function isUserOnline(userId: string): boolean {
-    return onlineUsers.has(userId);
-}
-
-export function getOnlineUsers(): string[] {
-    return Array.from(onlineUsers.keys());
 }

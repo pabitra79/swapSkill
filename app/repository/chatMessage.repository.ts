@@ -72,8 +72,6 @@ export class ChatMessageRepository {
         });
     }
 
-    // Get all conversations for a user
-    // Get all conversations for a user - FIXED VERSION
 async getConversations(userId: string): Promise<any[]> {
     const userObjectId = new mongoose.Types.ObjectId(userId);
     
@@ -120,7 +118,6 @@ async getConversations(userId: string): Promise<any[]> {
     return conversations;
 }
 
-    // Delete all messages for a swap request
     async deleteBySwapRequest(swapRequestId: string): Promise<void> {
         await ChatMessage.deleteMany({
             swapRequestId: new mongoose.Types.ObjectId(swapRequestId)
