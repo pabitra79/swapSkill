@@ -339,7 +339,10 @@
                 </div>
                 <% } else if (request.status === 'accepted') { %>
                 <div class="d-grid gap-2">
-                  <a href="/chat" class="btn btn-primary">
+                  <a
+                    href="/chat?conversation=<%= request._id %>"
+                    class="btn btn-primary"
+                  >
                     <i class="fas fa-comments"></i> Start Chat
                   </a>
                   <a

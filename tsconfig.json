@@ -13,6 +13,6 @@
     "types": ["node", "express", "express-session"],
     "lib": ["ESNext"]
   },
-  "include": ["app/**/*.ts", "app.ts", "types/**/*.ts"],
+  "include": ["app/**/*.ts", "app.ts", "types/**/*.ts", "app/config/socket.config.ts"],
   "exclude": ["node_modules", "dist"]
 }
