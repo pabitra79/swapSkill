@@ -56,7 +56,7 @@ export const userRepository = {
     async findUserByResetToken(token: string): Promise<IUser | null> {
     return await User.findOne({
     resetPasswordToken: token,
-      resetPasswordExpires: { $gt: Date.now() }, 
+    resetPasswordExpires: { $gt: Date.now() }, 
     });
     },
     async updatePassword(

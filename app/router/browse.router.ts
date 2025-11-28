@@ -1,4 +1,4 @@
-// app/router/profile.router.ts
+
 import { Router } from 'express';
 import { browseController } from '../controllers/browse.controller';
 import { requireAuth } from '../middleware/auth.middleware';

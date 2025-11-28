@@ -9,7 +9,7 @@ export class ChatMessageRepository {
     async create(data: {
     swapRequestId: string;
     fromUser: string;
-    toUser: string;  // Keep this required in repository
+    toUser: string;  
     message: string;
 }): Promise<IChatMessage> {
     const messageData = {
@@ -30,7 +30,7 @@ export class ChatMessageRepository {
         limit: number = 50
     ): Promise<IChatMessage[]> {
         return await ChatMessage.find({
-            swapRequestId: new mongoose.Types.ObjectId(swapRequestId)
+        swapRequestId: new mongoose.Types.ObjectId(swapRequestId)
         })
         .populate('fromUser', 'name email profile')
         .populate('toUser', 'name email profile')
@@ -52,7 +52,6 @@ export class ChatMessageRepository {
         );
     }
 
-    // Get unread count for user
     async getUnreadCount(userId: string): Promise<number> {
         return await ChatMessage.countDocuments({
             toUser: new mongoose.Types.ObjectId(userId),
@@ -92,7 +91,7 @@ async getConversations(userId: string): Promise<any[]> {
                 _id: '$swapRequestId',
                 lastMessage: { $first: '$message' },
                 lastMessageTime: { $first: '$createdAt' },
-                lastMessageFromUser: { $first: '$fromUser' }, // Renamed for clarity
+                lastMessageFromUser: { $first: '$fromUser' }, 
                 toUser: { $first: '$toUser' }
             }
         },

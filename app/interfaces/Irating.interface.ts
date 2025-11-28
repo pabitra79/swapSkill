@@ -13,9 +13,9 @@ export interface IRating extends Document {
 }
 
 export interface IRatingInput {
-  sessionId: string | Types.ObjectId;  // Allow both
-  raterId: string | Types.ObjectId;    // Allow both
-  ratedUserId: string | Types.ObjectId; // Allow both
+  sessionId: string | Types.ObjectId;  
+  raterId: string | Types.ObjectId;    
+  ratedUserId: string | Types.ObjectId; 
   rating: number;
   comment?: string;
   raterRole: 'teacher' | 'student';

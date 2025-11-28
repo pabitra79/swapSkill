@@ -1,4 +1,4 @@
-// app/validators/profile.validators.ts
+
 import Joi from 'joi';
 
 export const profileSchema = Joi.object({

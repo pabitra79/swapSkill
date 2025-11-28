@@ -7,7 +7,7 @@ import { matchService } from '../service/match.service';
 import { IMatchedUser } from '../interfaces/match.interface';
 const Homerouter = Router();
 
-// Public routes
+
 Homerouter.get("/", (req, res) => {
   const session = req.session as CustomSession;
   res.render("pages/home", {
@@ -18,11 +18,11 @@ Homerouter.get("/", (req, res) => {
 
 Homerouter.get("/about", (req, res) => {
   res.render("pages/about", {
-    title: "About - SkillSwap",  // ← Fixed: was "Home"
+    title: "About - SkillSwap",  
   });
 });
 
-// Dashboard route with match support
+
 Homerouter.get("/dashboard", requireAuth, async (req, res) => {
   try {
     const session = req.session as CustomSession;
@@ -31,15 +31,12 @@ Homerouter.get("/dashboard", requireAuth, async (req, res) => {
     if (!user) {
       return res.redirect('/api/login');
     }
-
-    // Check if profile is complete
     const isProfileComplete = Boolean(
       user.profile?.bio && 
       user.profile?.teachSkills?.length > 0 && 
       user.profile?.learnSkills?.length > 0
     );
-
-    // Get top matches
+    
     let topMatches: IMatchedUser[] = [];
     try {
       const allUsers = await userRepository.getAllUsers();

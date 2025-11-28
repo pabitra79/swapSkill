@@ -8,7 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import sessionRepository from '../repository/session.repository';
 
-const storage = multer.diskStorage({
+  const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'avatars');
     if (!fs.existsSync(uploadDir)) {
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, 'avatar-' + uniqueSuffix + path.extname(file.originalname));
   }
-});
+  });
 
 const upload = multer({
   storage: storage,
@@ -36,7 +36,7 @@ const upload = multer({
       cb(new Error('Only image files are allowed!'));
     }
   }
-});
+});  
 
 class ProfileController {
   showEditProfile = async (req: Request, res: Response): Promise<any> => {
@@ -219,15 +219,14 @@ class ProfileController {
       isOwnProfile = true;
     }
 
-    // 🔥 CALCULATE REAL STATS FROM SESSIONS
+// calculate for stats
     const userStats = await sessionRepository.calculateUserBalance(user._id.toString());
 
-    // Format the stats for the profile
     const profileStats = {
       completedSessions: userStats.totalSessions || 0,
       hoursTaught: userStats.hoursTaught || 0,
       hoursLearned: userStats.hoursLearned || 0,
-      responseRate: user.stats?.responseRate || 0 // Keep existing response rate
+      responseRate: user.stats?.responseRate || 0 
     };
 
     res.render('pages/profile/view-profile', {
@@ -255,7 +254,7 @@ class ProfileController {
             twitter: ''
           }
         },
-        stats: profileStats, // 🔥 Use real calculated stats
+        stats: profileStats, 
         createdAt: user.createdAt
       },
       isOwnProfile,

@@ -11,24 +11,21 @@ export class ChatController {
         this.sendMessage = this.sendMessage.bind(this);
     }
 
-   private getUserId(req: Request): string {
+    private getUserId(req: Request): string {
         if (req.user && req.user._id) return req.user._id.toString();
         throw new Error('User not authenticated');
     }
 
-   async getChatPage(req: Request, res: Response) {
+    async getChatPage(req: Request, res: Response) {
     try {
         const userId = this.getUserId(req);
         const { conversation: activeConversationId } = req.query;
         
         const conversations = await chatMessageService.getConversations(userId);
-        
-        // DEBUG: Log conversations
-        console.log('🔍 Conversations to render:', conversations.length);
         conversations.forEach((conv, i) => {
             console.log(`  ${i + 1}. ${conv.otherUser.name} (ID: ${conv.swapRequestId})`);
         });
-        
+
         let activeConversation = null;
 
         if (activeConversationId && typeof activeConversationId === 'string') {
@@ -40,10 +37,10 @@ export class ChatController {
             conversations,
             activeConversation,
             currentUser: req.user,
-             user: req.user,        // Add this for navbar
+            user: req.user,       
         });
     } catch (error) {
-        console.error('❌ Chat page error:', error);
+        console.error(' Chat page error:', error);
         res.status(500).render('error', {
             title: 'Error - SkillSwap',
             message: 'Failed to load chat'
@@ -67,12 +64,12 @@ export class ChatController {
     async sendMessage(req: Request, res: Response) {
     try {
         const userId = this.getUserId(req);
-        const { swapRequestId, message } = req.body; // Remove toUserId
+        const { swapRequestId, message } = req.body; 
         
         const result = await chatMessageService.sendMessage({ 
             swapRequestId, 
             fromUserId: userId, 
-            message // Only pass message, let service determine toUserId
+            message 
         });
 
         if (result.success) {
@@ -87,10 +84,8 @@ export class ChatController {
     } catch (error: any) {
         res.status(500).json({ success: false, error: 'Failed to send message' });
     }
-}
+    }
 
-
-    // API: Get all conversations (for sidebar)
     async getConversations(req: Request, res: Response) {
         try {
             const userId = this.getUserId(req);
@@ -98,7 +93,7 @@ export class ChatController {
 
             res.json({ success: true, conversations });
         } catch (error: any) {
-            console.error('❌ Get conversations error:', error);
+            console.error(' Get conversations error:', error);
             res.status(500).json({
                 success: false,
                 error: 'Failed to load conversations'
@@ -106,7 +101,6 @@ export class ChatController {
         }
     }
 
-    // API: Get unread count
     async getUnreadCount(req: Request, res: Response) {
         try {
             const userId = this.getUserId(req);
@@ -114,7 +108,7 @@ export class ChatController {
 
             res.json({ success: true, count });
         } catch (error: any) {
-            console.error('❌ Get unread count error:', error);
+            console.error(' Get unread count error:', error);
             res.status(500).json({
                 success: false,
                 error: 'Failed to get unread count'

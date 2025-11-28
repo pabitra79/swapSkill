@@ -9,9 +9,9 @@ import { initializeSocket } from "./app/config/socket.config";
 const app = express();
 const httpServer = createServer(app);
 
-// ✅ CORRECT: Get io instance and make it available
+// Get io instance and make it available
 const io = initializeSocket(httpServer);
-app.set('io', io); // This allows routes to access io
+app.set('io', io); 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views')); 
 
-// ✅ ADD: Serve Socket.io client
+//  Serve Socket.io client
 app.get('/socket.io/socket.io.js', (req, res) => {
   res.sendFile(require.resolve('socket.io-client/dist/socket.io.js'));
 });
@@ -34,6 +34,8 @@ import { sessionConfig } from "./app/config/sessionConfig";
 app.use(sessionConfig);
 
 // Your routes...
+import { adminRouter } from './app/router/admin.router';
+app.use('/admin', adminRouter);
 import { Authrouter } from "./app/router/auth.router";
 app.use("/api",Authrouter);
 import { Homerouter } from "./app/router/home.router";

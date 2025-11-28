@@ -1,4 +1,4 @@
-// src/service/rating.service.ts
+
 import { IRatingInput } from '../interfaces/Irating.interface';
 import { ratingRepository } from '../repository/rating.repository';
 
@@ -9,21 +9,18 @@ export class RatingService {
     ratedUserId: string;
     rating: number;
     comment: string;
-    raterRole: string; // Accept string first
+    raterRole: string; 
   }) {
     try {
-      // Validate raterRole
       if (ratingData.raterRole !== 'teacher' && ratingData.raterRole !== 'student') {
         return { success: false, error: 'Invalid rater role' };
       }
 
-      // Type assertion after validation
       const validRatingData: IRatingInput = {
         ...ratingData,
         raterRole: ratingData.raterRole as 'teacher' | 'student'
       };
 
-      // Check if rating already exists for this session from this user
       const existingRating = await ratingRepository.getRatingBySessionAndRater(
         ratingData.sessionId, 
         ratingData.raterId
@@ -33,7 +30,6 @@ export class RatingService {
         return { success: false, error: 'You have already rated this session' };
       }
 
-      // Create new rating with validated data
       const newRating = await ratingRepository.createRating(validRatingData);
 
       return { 

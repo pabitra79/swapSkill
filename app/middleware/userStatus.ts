@@ -3,7 +3,7 @@ import { redisClient } from '../config/redisConfig';
 
 export const cacheChatMessages = async (swapId: string, messages: any[]) => {
   const key = `chat:${swapId}`;
-  await redisClient.setEx(key, 3600, JSON.stringify(messages)); // Cache for 1 hour
+  await redisClient.setEx(key, 3600, JSON.stringify(messages)); 
 };
 
 export const getCachedChatMessages = async (swapId: string) => {

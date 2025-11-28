@@ -33,20 +33,14 @@ export class SessionController {
     try {
       const { partnerId, skill, hours, date, role } = req.body;
       const userId = (req as any).user._id;
-
-      // Validation
       if (!partnerId || !skill || !hours || !date || !role) {
         return res.status(400).json({ error: 'All fields are required' });
       }
-
-      // Check if swap request exists and is accepted
       const swapExists = await swapRequestRepository.checkSwapExists(userId, partnerId);
 
       if (!swapExists) {
         return res.status(403).json({ error: 'No accepted swap request with this user' });
       }
-
-      // Prepare session data based on role
       const sessionData = {
         teacher: role === 'teacher' ? userId : partnerId,
         student: role === 'teacher' ? partnerId : userId,
@@ -56,7 +50,6 @@ export class SessionController {
         rated: false
       };
 
-      // Create session using repository
       const newSession = await sessionRepository.createSession(sessionData);
 
       res.status(201).json({
@@ -72,9 +65,6 @@ export class SessionController {
     }
   }
 
-  // New: Show rating form
-  // New: Show rating form
-// New: Show rating form
 async showRatingForm(req: Request, res: Response) {
   try {
     const { sessionId } = req.params;
@@ -87,31 +77,30 @@ async showRatingForm(req: Request, res: Response) {
     const session = await sessionRepository.getSessionById(sessionId);
     
     if (!session) {
-      console.log('❌ Session not found:', sessionId);
+      console.log('Session not found:', sessionId);
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    console.log('🔍 Session found:', session._id);
-    console.log('🔍 Session teacher:', session.teacher);
-    console.log('🔍 Session student:', session.student);
+    console.log(' Session found:', session._id);
+    console.log(' Session teacher:', session.teacher);
+    console.log(' Session student:', session.student);
 
-    // FIX: Handle both string and object IDs for teacher and student
     const teacherId = session.teacher._id ? session.teacher._id.toString() : session.teacher.toString();
     const studentId = session.student._id ? session.student._id.toString() : session.student.toString();
 
-    console.log('🔍 Teacher ID:', teacherId);
-    console.log('🔍 Student ID:', studentId);
-    console.log('🔍 Current User ID:', userId);
+    console.log(' Teacher ID:', teacherId);
+    console.log(' Student ID:', studentId);
+    console.log(' Current User ID:', userId);
 
-    // FIX: Compare properly
+    //  Compare properly
     if (teacherId !== userId && studentId !== userId) {
-      console.log('❌ User not authorized to rate this session');
+      console.log(' User not authorized to rate this session');
       return res.status(403).json({ error: 'Not authorized' });
     }
 
     // Check if already rated
     if (session.rated) {
-      console.log('ℹ️ Session already rated');
+      console.log(' Session already rated');
       return res.render('sessions/already-rated', {
         title: 'Already Rated',
         session,
@@ -122,7 +111,7 @@ async showRatingForm(req: Request, res: Response) {
     // Determine who to rate (the other person in the session)
     const userToRate = teacherId === userId ? session.student : session.teacher;
 
-    console.log('✅ Rendering rating page for session:', sessionId);
+    console.log(' Rendering rating page for session:', sessionId);
 
     // Render the rating page
     res.render('sessions/rate-session', {
@@ -133,20 +122,18 @@ async showRatingForm(req: Request, res: Response) {
     });
 
   } catch (error) {
-    console.error('❌ Error loading rating form:', error);
+    console.error(' Error loading rating form:', error);
     res.status(500).json({ error: 'Failed to load rating form' });
   }
 }
 
-  // New: Submit rating
-  // New: Submit rating
 async submitRating(req: Request, res: Response) {
   try {
     const { sessionId } = req.params;
     const userId = (req as any).user._id;
     const { rating, comment } = req.body;
 
-    // Validation
+
     if (!rating || rating < 1 || rating > 5) {
       return res.status(400).json({ 
         success: false, 
@@ -154,7 +141,7 @@ async submitRating(req: Request, res: Response) {
       });
     }
 
-    // Get session details
+
     const session = await sessionRepository.getSessionById(sessionId);
     
     if (!session) {
@@ -163,12 +150,8 @@ async submitRating(req: Request, res: Response) {
         error: 'Session not found' 
       });
     }
-
-    // FIX: Handle both string and object IDs
     const teacherId = session.teacher._id ? session.teacher._id.toString() : session.teacher.toString();
     const studentId = session.student._id ? session.student._id.toString() : session.student.toString();
-
-    // Check if user is part of this session
     if (teacherId !== userId && studentId !== userId) {
       return res.status(403).json({ 
         success: false, 
@@ -176,20 +159,17 @@ async submitRating(req: Request, res: Response) {
       });
     }
 
-    // Check if already rated
     if (session.rated) {
       return res.status(400).json({ 
         success: false, 
         error: 'This session has already been rated' 
       });
     }
-
-    // Determine who is being rated (the other person in the session)
     const ratedUserId = teacherId === userId ? studentId : teacherId;
     
     const raterRole = teacherId === userId ? 'teacher' as const : 'student' as const;
 
-    // Submit rating
+
     const ratingResult = await ratingService.submitRating({
       sessionId: sessionId,
       raterId: userId,
@@ -200,7 +180,6 @@ async submitRating(req: Request, res: Response) {
     });
 
     if (ratingResult.success) {
-      // Mark session as rated
       await sessionRepository.markSessionAsRated(sessionId);
 
       res.json({
@@ -224,7 +203,6 @@ async submitRating(req: Request, res: Response) {
   }
 }
 
-  // Get session history (existing method)
   async getSessionHistory(req: Request, res: Response) {
     try {
       const userId = (req as any).user._id;
@@ -243,7 +221,7 @@ async submitRating(req: Request, res: Response) {
     }
   }
 
-  // Get user balance (existing method)
+
   async getUserBalance(req: Request, res: Response) {
     try {
       const userId = (req as any).user._id;
@@ -257,7 +235,6 @@ async submitRating(req: Request, res: Response) {
     }
   }
 
-  // Get dashboard stats (existing method)
   async getDashboardStats(req: Request, res: Response) {
     try {
       const userId = (req as any).user._id;

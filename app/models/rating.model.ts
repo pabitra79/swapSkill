@@ -1,4 +1,4 @@
-// src/models/rating.model.ts
+
 import mongoose, { Schema } from 'mongoose';
 import { IRating } from '../interfaces/Irating.interface';
 

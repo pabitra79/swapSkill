@@ -133,8 +133,8 @@ export class RequestController {
                 requests,
                 pendingCount,
                 currentStatus: status,
-                user: req.user,  // Add this for navbar
-            currentUser: req.user // Add this for consistency
+                user: req.user,  
+                currentUser: req.user 
             });
         } catch (error) {
             console.error(' Get outbox error:', error);

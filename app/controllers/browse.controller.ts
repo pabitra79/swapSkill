@@ -14,20 +14,16 @@ class BrowseController {
       if (!currentUser) {
         return res.redirect('/api/login');
       }
-
-      // Get query parameters for search and filters
       const searchQuery = req.query.search as string || '';
       const locationFilter = req.query.location as string || '';
       const experienceFilter = req.query.experience as string || '';
-      const sortBy = req.query.sort as string || 'match'; // match, newest, name
+      const sortBy = req.query.sort as string || 'match'; 
 
-      // Get all users
       const allUsers = await userRepository.getAllUsers();
 
-      // Calculate matches for all users
       let matchedUsers = await matchService.getAllUsersWithMatch(currentUser, allUsers);
 
-      // Apply search filter (by skill)
+
       if (searchQuery) {
         matchedUsers = matchedUsers.filter(item => {
           const teachSkills = item.user.profile?.teachSkills || [];
@@ -40,21 +36,18 @@ class BrowseController {
         });
       }
 
-      // Apply location filter
       if (locationFilter) {
         matchedUsers = matchedUsers.filter(item => 
           item.user.profile?.location?.toLowerCase().includes(locationFilter.toLowerCase())
         );
       }
 
-      // Apply experience filter
       if (experienceFilter) {
         matchedUsers = matchedUsers.filter(item => 
           item.user.profile?.experienceLevel === experienceFilter
         );
       }
 
-      // Sort users
       switch (sortBy) {
         case 'newest':
           matchedUsers.sort((a, b) => 

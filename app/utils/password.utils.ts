@@ -1,8 +1,5 @@
 import crypto from "crypto";
 
-
-//   Generate random password with mixed characters
- 
 export const generateRandomPassword = (length = 12): string => {
   const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const lowercase = "abcdefghijklmnopqrstuvwxyz";
@@ -28,9 +25,6 @@ export const generateRandomPassword = (length = 12): string => {
     .join("");
 };
 
-
-//   Generate cryptographically secure password
- 
 export const generateSecurePassword = (length = 12): string => {
   const charset =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";

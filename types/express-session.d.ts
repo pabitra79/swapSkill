@@ -8,6 +8,7 @@ declare module 'express-session' {
       id: string;
       email: string;
       name: string;
+      role: 'user' | 'admin';  
     };
     token?: string;
   }
@@ -19,6 +20,7 @@ declare module 'express' {
       _id: string;
       email: string;
       name: string;
+      role: 'user' | 'admin';  
     };
   }
 }

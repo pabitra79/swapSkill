@@ -20,8 +20,8 @@ export interface ISessionInput {
 }
 
 export interface IBalanceStats {
-  hoursTaught: number;      // Use consistent naming
-  hoursLearned: number;     // Use consistent naming
+  hoursTaught: number;      
+  hoursLearned: number;     
   balance: number;
   totalSessions: number;
 }

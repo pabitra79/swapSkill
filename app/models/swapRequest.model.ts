@@ -38,7 +38,6 @@ const swapRequestSchema = new Schema<ISwapRequest>({
     timestamps: true
 });
 
-// Index for faster queries
 swapRequestSchema.index({ fromUser: 1, toUser: 1, status: 1 });
 swapRequestSchema.index({ toUser: 1, status: 1 });
 

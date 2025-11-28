@@ -40,15 +40,13 @@ export const sendWelcomeEmail = async (
   }
 };
 
-
-//   Send verification success email
  
 export const sendVerificationSuccessEmail = async (
   email: string,
   name: string
 ): Promise<void> => {
   try {
-    console.log("📧 Sending verification success email to:", email);
+    console.log(" Sending verification success email to:", email);
 
     const emailContent = verificationSuccessTemplate(name);
 
@@ -64,12 +62,11 @@ export const sendVerificationSuccessEmail = async (
     console.log(" Verification success email sent:", info.messageId);
   } catch (error) {
     console.error(" Error sending verification success email:", error);
-    // Don't throw error here, verification already succeeded
+
   }
 };
 
-//  Send password reset email
- 
+
 export const sendPasswordResetEmail = async (
   email: string,
   name: string,

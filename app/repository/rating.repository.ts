@@ -1,11 +1,10 @@
-// src/repository/rating.repository.ts
+
 import Rating from '../models/rating.model';
 import { IRating, IRatingInput } from '../interfaces/Irating.interface';
 import { Types } from 'mongoose';
 
 class RatingRepository {
   async createRating(ratingData: IRatingInput): Promise<IRating> {
-    // Convert string IDs to ObjectIds if needed
     const processedData = {
       ...ratingData,
       sessionId: typeof ratingData.sessionId === 'string' ? 

@@ -3,12 +3,12 @@ import { ISession, ISessionInput, IBalanceStats } from '../interfaces/ISession.i
 
 const sessionSchema = new Schema<ISession>({
   teacher: {
-    type: Schema.Types.ObjectId,  // Use Schema.Types.ObjectId
+    type: Schema.Types.ObjectId,  
     ref: 'User',
     required: true
   },
   student: {
-    type: Schema.Types.ObjectId,  // Use Schema.Types.ObjectId
+    type: Schema.Types.ObjectId,  
     ref: 'User',
     required: true
   },
@@ -34,7 +34,6 @@ const sessionSchema = new Schema<ISession>({
   timestamps: true
 });
 
-// Indexes for faster queries
 sessionSchema.index({ teacher: 1, student: 1 });
 sessionSchema.index({ date: -1 });
 

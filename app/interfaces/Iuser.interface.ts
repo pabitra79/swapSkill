@@ -5,6 +5,7 @@ export interface IUser extends Document{
     email: string;
     password: string;
     name: string;
+    role: 'user' | 'admin'; //
     isVerified: boolean;
     verificationToken?: string;
     resetPasswordToken?: string;
@@ -18,10 +19,10 @@ export interface IUser extends Document{
     avatar: string;
     language: string;
     timezone: string;
-    experienceLevel: string;        // ADDED
-        hourlyRate: number | null;      // ADDED
-        website: string;                // ADDED
-        socialLinks: {                  // ADDED
+    experienceLevel: string;       
+        hourlyRate: number | null;      
+        website: string;               
+        socialLinks: {                 
             github: string;
             linkedin: string;
             twitter: string;
