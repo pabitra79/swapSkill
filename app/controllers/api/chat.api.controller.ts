@@ -1,54 +1,18 @@
-// src/controllers/chat.controller.ts
+// app/controllers/api/chat.api.controller.ts
 import { Request, Response } from 'express';
-import { chatMessageService } from '../service/chatMessage.service';
-import { swapRequestRepository } from '../repository/swapRequest.repository';
+import { chatMessageService } from '../../service/chatMessage.service';
 
-export class ChatController {
+export class ChatApiController {
     constructor() {
-        this.getChatPage = this.getChatPage.bind(this);
         this.getChatHistory = this.getChatHistory.bind(this);
         this.getConversations = this.getConversations.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
+        this.getUnreadCount = this.getUnreadCount.bind(this);
     }
 
     private getUserId(req: Request): string {
         if (req.user && req.user._id) return req.user._id.toString();
         throw new Error('User not authenticated');
-    }
-
-    async getChatPage(req: Request, res: Response) {
-        try {
-            const userId = this.getUserId(req);
-            const { conversation: activeConversationId } = req.query;
-            
-            console.log(' Loading chat page for user:', userId);
-            
-            const conversations = await chatMessageService.getConversations(userId);
-            console.log(` Found ${conversations.length} conversations`);
-            
-            conversations.forEach((conv, i) => {
-                console.log(`  ${i + 1}. ${conv.otherUser.name} (ID: ${conv.swapRequestId})`);
-            });
-
-            let activeConversation = null;
-
-            if (activeConversationId && typeof activeConversationId === 'string') {
-                activeConversation = conversations.find(c => c.swapRequestId === activeConversationId);
-                console.log(' Active conversation:', activeConversation ? 'found' : 'not found');
-            }
-
-            res.render('pages/chat/index', {
-                title: 'Messages - SkillSwap',
-                conversations: conversations || [],
-                activeConversation: activeConversation || null,
-                currentUser: req.user,
-                user: req.user,       
-            });
-        } catch (error) {
-            console.error(' Chat page error:', error);
-            // Redirect instead of rendering non-existent error page
-            res.redirect('/dashboard?error=chat_load_failed');
-        }
     }
 
     async getChatHistory(req: Request, res: Response) {
@@ -62,14 +26,23 @@ export class ChatController {
             
             if (result.success) {
                 console.log(' Loaded', result.messages?.length || 0, 'messages');
-                res.json({ success: true, messages: result.messages || [] });
+                res.json({ 
+                    success: true, 
+                    data: result.messages || [] 
+                });
             } else {
                 console.error(' Failed to load messages:', result.error);
-                res.status(400).json({ success: false, error: result.error });
+                res.status(400).json({ 
+                    success: false, 
+                    error: result.error 
+                });
             }
         } catch (error: any) {
             console.error(' Get chat history error:', error);
-            res.status(500).json({ success: false, error: 'Failed to load chat history' });
+            res.status(500).json({ 
+                success: false, 
+                error: 'Failed to load chat history' 
+            });
         }
     }
 
@@ -80,6 +53,13 @@ export class ChatController {
             
             console.log(' Sending message:', { swapRequestId, userId, messageLength: message?.length });
             
+            if (!swapRequestId || !message) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Swap request ID and message are required'
+                });
+            }
+
             const result = await chatMessageService.sendMessage({ 
                 swapRequestId, 
                 fromUserId: userId, 
@@ -92,13 +72,22 @@ export class ChatController {
                     console.log(' Emitting new message via Socket.io');
                     io.to(`chat_${swapRequestId}`).emit('new_message', result.message);
                 }
-                res.json({ success: true, message: result.message });
+                res.json({ 
+                    success: true, 
+                    data: result.message 
+                });
             } else {
-                res.status(400).json({ success: false, error: result.error });
+                res.status(400).json({ 
+                    success: false, 
+                    error: result.error 
+                });
             }
         } catch (error: any) {
             console.error(' Send message error:', error);
-            res.status(500).json({ success: false, error: 'Failed to send message' });
+            res.status(500).json({ 
+                success: false, 
+                error: 'Failed to send message' 
+            });
         }
     }
 
@@ -110,7 +99,10 @@ export class ChatController {
             const conversations = await chatMessageService.getConversations(userId);
             console.log(' Found conversations:', conversations.length);
 
-            res.json({ success: true, conversations: conversations || [] });
+            res.json({ 
+                success: true, 
+                data: conversations || [] 
+            });
         } catch (error: any) {
             console.error(' Get conversations error:', error);
             res.status(500).json({
@@ -125,7 +117,10 @@ export class ChatController {
             const userId = this.getUserId(req);
             const count = await chatMessageService.getUnreadCount(userId);
 
-            res.json({ success: true, count });
+            res.json({ 
+                success: true, 
+                data: { count } 
+            });
         } catch (error: any) {
             console.error(' Get unread count error:', error);
             res.status(500).json({
@@ -136,4 +131,4 @@ export class ChatController {
     }
 }
 
-export const chatController = new ChatController();
+export const chatApiController = new ChatApiController();

@@ -1,0 +1,42 @@
+{
+  "swaggerDefinition": {
+    "openapi": "3.0.0",
+    "info": {
+      "title": "SkillSwap API",
+      "version": "1.0.0",
+      "description": "API for SkillSwap platform - Skill exchange marketplace",
+      "contact": {
+        "name": "API Support"
+      }
+    },
+    "servers": [
+      {
+        "url": "http://localhost:5000",
+        "description": "Development server"
+      }
+    ],
+    "components": {
+      "securitySchemes": {
+        "sessionAuth": {
+          "type": "apiKey",
+          "in": "cookie",
+          "name": "connect.sid"
+        }
+      }
+    },
+    "tags": [
+      { "name": "Admin", "description": "Admin management endpoints" },
+      { "name": "Authentication", "description": "User authentication endpoints" },
+      { "name": "Browse", "description": "User browsing and search endpoints" },
+      { "name": "Chat", "description": "Real-time chat endpoints" },
+      { "name": "Profile", "description": "User profile management endpoints" },
+      { "name": "Requests", "description": "Swap request management endpoints" },
+      { "name": "Sessions", "description": "Session logging and rating endpoints" }
+    ]
+  },
+  "apis": [
+    "./app.ts",
+    "./app/router/swagger/*.ts",
+    "./app/router/swagger/**/*.ts"
+  ]
+}

@@ -11,12 +11,54 @@ class AdminController {
       const activities = await adminRepository.getRecentActivities(5);
       const topSkills = await adminRepository.getTopSkills();
 
+      // Safely handle the user object with proper typing
+      const authReq = req as AuthenticatedRequest;
+      const user = authReq.user;
+      
+      const safeUser = {
+        _id: user?._id || 'unknown',
+        name: user?.name || 'Admin User',
+        email: user?.email || 'admin@skillswap.com',
+        role: user?.role || 'admin',
+        profile: user?.profile || {
+          avatar: null,
+          bio: '',
+          teachSkills: [],
+          learnSkills: [],
+          availability: '',
+          location: '',
+          language: 'English',
+          timezone: 'IST',
+          experienceLevel: '',
+          hourlyRate: null,
+          website: '',
+          socialLinks: {
+            github: '',
+            linkedin: '',
+            twitter: ''
+          }
+        }
+      };
+
       res.render('admin/dashboard', {
         title: 'Admin Dashboard - SkillSwap',
-        user: req.user,
-        stats,
-        activities,
-        topSkills
+        user: safeUser,
+        stats: stats || {
+          totalUsers: 0,
+          verifiedUsers: 0,
+          totalSessions: 0,
+          totalHours: 0,
+          totalSwapRequests: 0,
+          acceptedSwaps: 0
+        },
+        activities: activities || {
+          recentUsers: [],
+          recentSessions: []
+        },
+        topSkills: topSkills || {
+          topTeach: [],
+          topLearn: []
+        }
       });
     } catch (error) {
       console.error('Error loading admin dashboard:', error);

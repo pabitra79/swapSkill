@@ -152,7 +152,6 @@ class AuthController {
 
     const token = generateToken(user._id.toString());
 
-    // Store user in session WITH ROLE
     const session = req.session as CustomSession;
     session.user = {
       id: user._id.toString(),
@@ -162,7 +161,7 @@ class AuthController {
     };
     session.token = token;
 
-    // Save session and redirect
+
     return req.session.save((err) => {
       if (err) {
         console.error(' Session save error:', err);
@@ -179,10 +178,10 @@ class AuthController {
       console.log('👤 User role:', session.user?.role);
       
       if (session.user?.role === 'admin') {
-        console.log('🛡️ Redirecting to admin dashboard');
+        console.log(' Redirecting to admin dashboard');
         return res.redirect("/admin/dashboard");
       } else {
-        console.log('👤 Redirecting to user dashboard');
+        console.log(' Redirecting to user dashboard');
         return res.redirect("/dashboard");
       }
     });

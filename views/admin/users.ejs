@@ -748,13 +748,13 @@
           const data = await response.json();
 
           if (response.ok) {
-            alert(`✅ ${data.message}`);
+            alert(` ${data.message}`);
             document.querySelector(`tr[data-user-id="${userId}"]`).remove();
           } else {
-            alert(`❌ ${data.error || "Error deleting user"}`);
+            alert(` ${data.error || "Error deleting user"}`);
           }
         } catch (error) {
-          alert("❌ Error deleting user");
+          alert(" Error deleting user");
         }
       }
 

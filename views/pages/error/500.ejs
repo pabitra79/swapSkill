@@ -27,12 +27,15 @@
     <div class="error-container">
       <div class="error-card">
         <h1>500 - Server Error</h1>
-        <h2>Chat Loading Failed</h2>
+        <h2>Something Went Wrong</h2>
         <p class="lead">
-          <%= error || 'Failed to load chat. Please try again later.' %>
+          <%= message || 'An unexpected error occurred. Please try again later.'
+          %>
         </p>
         <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
-        <a href="/chat" class="btn btn-secondary">Retry</a>
+        <a href="javascript:history.back()" class="btn btn-secondary"
+          >Go Back</a
+        >
       </div>
     </div>
   </body>

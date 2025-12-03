@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { SessionData } from 'express-session';
+import { AuthenticatedRequest } from '../../types/session.types';
 
 interface CustomSession extends SessionData {
   user?: {
@@ -11,7 +12,7 @@ interface CustomSession extends SessionData {
   token?: string;
 }
 
-// Extend Express Request type to include user
+
 declare global {
   namespace Express {
     interface Request {
@@ -25,7 +26,6 @@ declare global {
   }
 }
 
-// Existing middleware - Updated
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   const session = req.session as CustomSession;
   
@@ -44,15 +44,13 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
       success: false,
       message: 'No session found. Please log in again.'
     });
+
   }
 
   // Check if user exists in session
   if (!session.user || !session.user.id) {
     console.error(' User not authenticated in session');
-    return res.status(401).json({
-      success: false,
-      message: 'Authentication required. Please log in.'
-    });
+    return res.redirect('/api/login');
   }
 
 
@@ -60,38 +58,38 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
     _id: session.user.id,
     email: session.user.email,
     name: session.user.name,
-    role: session.user.role  // ← ADD ROLE HERE
+    role: session.user.role  
   };
 
   console.log(' User authenticated:', req.user._id, 'Role:', req.user.role);
   next();
 };
 
-// NEW MIDDLEWARE - Admin Only
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
   const session = req.session as CustomSession;
   
   console.log(' Admin middleware - Checking admin access');
 
   // First check authentication
+  // First check authentication
   if (!req.session || !session.user || !session.user.id) {
     console.error(' User not authenticated');
-    return res.status(401).json({
-      success: false,
-      message: 'Authentication required. Please log in.'
-    });
+    return res.redirect('/admin/login');
   }
 
  
-  req.user = {
+  // Cast to AuthenticatedRequest and set user
+  const authReq = req as AuthenticatedRequest;
+  authReq.user = {
     _id: session.user.id,
     email: session.user.email,
     name: session.user.name,
-    role: session.user.role
+    role: session.user.role,
+    profile: {} // Add empty profile to prevent undefined errors
   };
 
   // Check if user is admin
-  if (req.user.role !== 'admin') {
+   if (authReq.user.role !== 'admin') {
     console.error(' Access denied - User is not admin');
     return res.status(403).json({
       success: false,
@@ -99,6 +97,6 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
     });
   }
 
-  console.log(' Admin access granted:', req.user._id);
+  console.log(' Admin access granted:', authReq.user._id);
   next();
 };

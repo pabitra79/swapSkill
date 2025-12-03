@@ -13,10 +13,28 @@ export interface CustomSession extends SessionData {
 }
 
 export interface AuthenticatedRequest extends Request {
-  user: {
+  user?: {
     _id: string;
     email: string;
     name: string;
-    role: 'user' | 'admin';  
+    role: 'user' | 'admin';
+    profile?: {
+      avatar?: string | null;
+      bio?: string;
+      teachSkills?: string[];
+      learnSkills?: string[];
+      availability?: string;
+      location?: string;
+      language?: string;
+      timezone?: string;
+      experienceLevel?: string;
+      hourlyRate?: number | null;
+      website?: string;
+      socialLinks?: {
+        github?: string;
+        linkedin?: string;
+        twitter?: string;
+      };
+    };
   };
 }
