@@ -2,6 +2,6 @@ services:
   - type: web
     name: swapskill-server
     env: node
-    buildCommand: npm install
-    startCommand: ts-node app.ts
+    buildCommand: npm install && npm run build
+    startCommand: node dist/app.js
     rootDir: .
