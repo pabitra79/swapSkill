@@ -13,6 +13,6 @@
     "types": ["node", "express", "express-session"],
     "lib": ["ESNext"]
   },
-  "include": ["**/*.ts"],
+  "include": ["app.ts", "**/*.ts", "swagger.json"],
   "exclude": ["node_modules", "dist"]
 }

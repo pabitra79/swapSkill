@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/app.js",
     "dev": "ts-node app.ts",
-    "build": "tsc"
+    "build": "tsc && cp swagger.json dist/ && cp -r public dist/ && cp -r views dist/"
   },
   "keywords": [],
   "author": "",

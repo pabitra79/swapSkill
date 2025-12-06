@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 // swagger
-const swaggerConfig = require(path.join(__dirname, 'swagger.json'));
+const swaggerConfig = require(path.join(process.cwd(), 'swagger.json'));;
 const swaggerSpec = swaggerJsDoc(swaggerConfig);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
