@@ -40,8 +40,8 @@ app.get('/socket.io/socket.io.js', (req, res) => {
 
 import {connectionDb} from "./app/config/dbConfig"
 connectionDb()
-import  {connectRedis} from "./app/config/redisConfig"
-connectRedis()
+// import  {connectRedis} from "./app/config/redisConfig"
+// connectRedis()
 import { sessionConfig } from "./app/config/sessionConfig";
 app.use(sessionConfig);
 
