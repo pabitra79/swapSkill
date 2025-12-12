@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "dist/app.js",
   "scripts": {
+    "build": "tsc && cp swagger.json dist/ && cp -r public dist/ && cp -r views dist/",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/app.js",
-    "dev": "ts-node app.ts",
-    "build": "tsc && cp swagger.json dist/ && cp -r public dist/ && cp -r views dist/"
+    "dev": "ts-node app.ts"
   },
   "keywords": [],
   "author": "",
