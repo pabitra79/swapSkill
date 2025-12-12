@@ -1,12 +1,8 @@
 import session from 'express-session';
-import RedisStore from "connect-redis";
-import { redisClient } from './redisConfig';
+// Removed RedisStore and redisClient imports
 
 export const sessionConfig = session({
-  store: new RedisStore({ 
-    client: redisClient,
-    prefix: 'sess:' 
-  }),
+  // Removed Redis store - will use default memory store
   secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
